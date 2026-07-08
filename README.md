@@ -41,6 +41,13 @@ in.
 
 ## Build
 
+Full instructions for both targets are in **[docs/BUILD.md](docs/BUILD.md)**
+(Linux native, and DOS via the go32v2 cross-compiler). Prebuilt DOS binaries
+(`OLMS.EXE`, `CONFIG.EXE`) are in `releases/`, and a ready-to-run DOS bundle is
+attached to the GitHub Release.
+
+Quick version:
+
 Requires Free Pascal (`fpc` 3.x). No external Pascal libraries; the SDL backend
 links `libSDL2` and the archiver step calls an external zip/PKZIP.
 
