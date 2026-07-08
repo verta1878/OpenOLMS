@@ -1,32 +1,38 @@
-# DOS runtime — CWSDPMI
+# DOS runtime — CWSDPMI (with source)
 
 The DOS build of OpenOLMS is a 32-bit go32v2 program and needs a **DPMI host**
-at runtime. The standard one is **CWSDPMI** by Charles W. Sandmann.
+at runtime: **CWSDPMI** by Charles W. Sandmann. It is bundled here as both the
+runtime binary and its complete source, so the DOS release is fully
+GPL-compliant with nothing to fetch separately.
 
-## What to place here
+## Contents
 
-Drop these two files into this folder (unmodified):
+    CWSDPMI.EXE      the DPMI host (r7, official, unmodified)
+    CWSDPR0.EXE      ring-0 variant (optional)
+    CWSDPMI.DOC      CWSDPMI documentation / redistribution terms
+    cwsdpmi-src/     complete CWSDPMI source code (GPLv2)
+      COPYING        the GNU General Public License v2
+      COPYING.CWS    Sandmann's copyright addendum (distribute verbatim)
+      *.c *.h *.asm *.inc  the sources
+      makefile
 
-    CWSDPMI.EXE   the DPMI host
-    CWSDPMI.DOC   its license/documentation  (REQUIRED to redistribute the EXE)
+## Usage
 
-Then ship them alongside OLMS.EXE / CONFIG.EXE in the DOS release.
-
-## Where to get them
-
-Official DJGPP archive:
-  https://www.delorie.com/djgpp/  (v2 / current, "csdpmi*b.zip")
-FreeDOS also bundles CWSDPMI.
-
-Use the current release (r7) or any recent version. Do not modify the EXE
-(configuration via CWSPARAM only, if needed).
+Ship `CWSDPMI.EXE` alongside `OLMS.EXE` / `CONFIG.EXE` in the DOS release. The
+program loads the DPMI host automatically when run on bare DOS.
 
 ## License
 
-CWSDPMI is Copyright (C) Charles W. Sandmann, released under the GNU GPL v2.
-Its binary may be redistributed provided CWSDPMI.DOC accompanies CWSDPMI.EXE,
-the EXE is unmodified, and users are informed of their right to the CWSDPMI
-source code. The CWSDPMI source is available from the DJGPP archive above.
+CWSDPMI is Copyright (C) 1995-2010 Charles W. Sandmann, licensed under the
+**GNU General Public License v2** (see `cwsdpmi-src/COPYING` and
+`cwsdpmi-src/COPYING.CWS`). The binaries are the official, unmodified releases.
+The complete corresponding source is included in `cwsdpmi-src/`.
 
-This is a separate program from OpenOLMS; OpenOLMS is GPLv3. CWSDPMI (GPLv2) is
-bundled only as the DOS runtime host. The two are independent, GPL-family works.
+Source (this copy) is redistributed as part of the OpenOLMS repository:
+  https://github.com/verta1878/openolms   (dos-runtime/cwsdpmi-src/)
+Upstream / updates:
+  https://www.delorie.com/djgpp/
+
+CWSDPMI is a separate program from OpenOLMS. OpenOLMS is GPLv3; CWSDPMI is
+GPLv2. Both are GPL-family works, bundled together only so the DOS build runs
+out of the box.
