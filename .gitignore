@@ -1,0 +1,19 @@
+# Free Pascal build artifacts
+*.o
+*.ppu
+*.a
+*.compiled
+*.res
+lib/
+# built executables
+olms
+config
+config_demo
+examples/jam_pipeline_test
+examples/olms_qwk_demo
+*.exe
+# editor/OS
+*~
+.DS_Store
+link*.res
+ppas.sh
