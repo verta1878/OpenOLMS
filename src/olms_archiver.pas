@@ -180,7 +180,7 @@ end;
 function CompressPacket(const Cfg: TOlmsConfig; const Tag, PacketDir,
                         ArchivePath: string): TArchiveResult;
 var
-  ai: Integer; sr: TSearchRec; fl: TStringList;
+  ai: Integer; sr: SysUtils.TSearchRec; fl: TStringList;
 begin
   ai := FindArchiver(Cfg, Tag);
   if ai < 0 then
@@ -191,12 +191,12 @@ begin
   // gather the packet's files (names only; command runs in PacketDir)
   fl := TStringList.Create;
   try
-    if FindFirst(IncludeTrailingPathDelimiter(PacketDir)+'*', faAnyFile, sr) = 0 then
+    if SysUtils.FindFirst(IncludeTrailingPathDelimiter(PacketDir)+'*', faAnyFile, sr) = 0 then
     begin
       repeat
         if (sr.Attr and faDirectory) = 0 then fl.Add(sr.Name);
-      until FindNext(sr) <> 0;
-      FindClose(sr);
+      until SysUtils.FindNext(sr) <> 0;
+      SysUtils.FindClose(sr);
     end;
     Result := RunTemplate(Cfg.Archivers[ai].Compress, ArchivePath, PacketDir, fl);
   finally
