@@ -33,7 +33,8 @@ handle it.
    fpc -Tgo32v2 -O2 -Xs olms.pas
    fpc -Tgo32v2 -O2 -Xs config_demo.pas
    ```
-3. You get `OLMS.EXE` and `CONFIG.EXE`. Ship `CWSDPMI.EXE` with them.
+3. You get `OLMS.EXE` and `CONFIG.EXE`. Ship them with `CWSDPMI.EXE` from the
+   `dos-runtime/` folder (already bundled in this repo, with its license doc).
 
 ## Option B — build inside DOS / DOSBox
 

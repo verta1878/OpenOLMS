@@ -17,3 +17,7 @@ examples/olms_qwk_demo
 .DS_Store
 link*.res
 ppas.sh
+
+# DOS runtime (CWSDPMI) IS part of the repo despite the *.exe rule above
+!dos-runtime/CWSDPMI.EXE
+!dos-runtime/CWSDPR0.EXE
