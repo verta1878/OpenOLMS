@@ -43,7 +43,9 @@ unit olms_archiver;
 interface
 
 uses
-  SysUtils, Classes, Process, olms_config;
+  SysUtils, Classes,
+  {$IFDEF GO32V2} Dos {$ELSE} Process {$ENDIF},
+  olms_config;
 
 type
   TArchiveResult = record
@@ -110,7 +112,11 @@ end;
 function RunTemplate(const Template, Archive, Dir: string; FilesList: TStrings): TArchiveResult;
 var
   exe: string; args: TStringList; i: Integer;
+{$IFDEF GO32V2}
+  cmdline, savedir: string;
+{$ELSE}
   proc: TProcess; outstream: TStringStream; buf: array[0..2047] of Byte; n: Integer;
+{$ENDIF}
 begin
   FillChar(Result, SizeOf(Result), 0);
   args := TStringList.Create;
@@ -121,6 +127,25 @@ begin
     begin
       Result.Success := False; Result.Output := 'archiver disabled (OFF)'; Exit;
     end;
+
+{$IFDEF GO32V2}
+    // DOS: change into the working dir and Exec the archiver via COMSPEC.
+    args.Delimiter := ' '; args.StrictDelimiter := True;
+    cmdline := '/C ' + exe;
+    for i := 0 to args.Count-1 do cmdline := cmdline + ' ' + args[i];
+    savedir := GetCurrentDir;
+    try
+      if Dir <> '' then SetCurrentDir(Dir);
+      SwapVectors;
+      Exec(GetEnv('COMSPEC'), cmdline);
+      SwapVectors;
+      Result.ExitCode := DosExitCode;
+      Result.Success := (DosError = 0) and (Result.ExitCode = 0);
+      Result.Output := 'DosError=' + IntToStr(DosError);
+    finally
+      SetCurrentDir(savedir);
+    end;
+{$ELSE}
     proc := TProcess.Create(nil);
     outstream := TStringStream.Create('');
     try
@@ -148,6 +173,7 @@ begin
     finally
       outstream.Free; proc.Free;
     end;
+{$ENDIF}
   finally
     args.Free;
   end;
