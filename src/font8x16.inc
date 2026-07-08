@@ -1,3 +1,10 @@
+{
+  OpenOLMS - 8x16 cell font data (include)
+  SPDX-License-Identifier: GPL-3.0-or-later
+  Copyright (C) 2026  Antonio Rico / Ecstasy BBS (github.com/verta1878)
+  Distributed under the GNU General Public License v3 or later.
+  See the LICENSE file. Built in Free Pascal from published format specifications.
+}
 { font8x16.inc - 8x16 CP437 cell font (0..255). Row 0 top; bit7 leftmost. }
 const
   FONT8X16: array[0..255,0..15] of Byte = (
