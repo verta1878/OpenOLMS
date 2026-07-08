@@ -21,3 +21,9 @@ ppas.sh
 # DOS runtime (CWSDPMI) IS part of the repo despite the *.exe rule above
 !dos-runtime/CWSDPMI.EXE
 !dos-runtime/CWSDPR0.EXE
+
+# DOS cross-toolchain IS part of the repo (binaries + their source travel together)
+!toolchain/bin/ppcross386
+!toolchain/units/go32v2/*.ppu
+!toolchain/units/go32v2/*.o
+!toolchain/fpc-3.2.2.source.tar.gz
