@@ -65,6 +65,7 @@ src/        library units + the two programs
 examples/   runnable demos (JAM pipeline, sample QWK packet)
 docs/       design notes
 LICENSE     GNU GPL v3
+dos-runtime/  CWSDPMI DPMI host (binary + full GPLv2 source) for the DOS build
 ```
 
 ## Status
