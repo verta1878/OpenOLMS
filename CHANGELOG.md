@@ -4,7 +4,7 @@ All notable changes to OpenOLMS. Format: [Keep a Changelog](https://keepachangel
 
 ## [Unreleased]
 
-Initial clean-room implementation of the OLMS offline-mail door.
+Initial implementation of the OLMS offline-mail door.
 
 ### Added
 - Door (`olms`): dropfile reading (DORINFO1.DEF, DOOR.SYS) + command-line switches
@@ -23,6 +23,5 @@ Initial clean-room implementation of the OLMS offline-mail door.
 - Door user UI: main menu, conference selection
 
 ### Notes
-- Clean-room: built from open format specs + the OLMS manual; no original code.
 - Per-screen live-edit-to-disk wiring is complete for System Information; the
   remaining screens reuse the same `EditField` pattern.

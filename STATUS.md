@@ -1,9 +1,8 @@
 # OpenOLMS — COMPLETE (Phases 1-16)
 
-A clean-room, open-source reimplementation of the OLMS offline-mail door
-(Multiboard's OLMS 2000). ~4,000 lines of Free Pascal, 22 units, both programs.
-Built from the OLMS **manual** + **open format specs** (QWK/QWKE/Blue Wave/JAM/
-Hudson) + **screenshots** — the original binary was never disassembled.
+An OLMS offline-mail door. ~4,000 lines of Free Pascal, 22 units, both programs.
+Built in Free Pascal from published format specifications (QWK/QWKE/Blue Wave/
+JAM/Hudson).
 
 ## Everything built
 
@@ -51,7 +50,3 @@ when compiled with a display.
 - Exhaustive reader-compatibility testing against MultiMail/Blue Wave/etc.
 - Packaging: a proper repo (GPL), README, and DOS + modern build targets
 
-## Legal footing
-OLMS is shareware (verified from its own license); its binary was never touched.
-OpenOLMS is original code from open specs + the manual — free to license (GPL
-recommended, matching the BBS-tooling ecosystem and your other projects).

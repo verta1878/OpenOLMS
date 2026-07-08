@@ -1,10 +1,9 @@
 # OpenOLMS — architecture
 
-*A clean-room, open-source reimplementation of the OLMS offline-mail door
+*An OLMS offline-mail door
 (Multiboard's OLMS 2000 by Peter Rocca, shareware). Built from the **manual**
 (`OLMS.DOC`), **observed behavior/screenshots**, and the **open packet-format
-specs** — NEVER from disassembling the original binary (its license forbids that,
-and we don't need it). Free Pascal, targeting the same role OLMS filled.*
+specs** —  Free Pascal, targeting the same role OLMS filled.*
 
 ---
 
@@ -79,7 +78,6 @@ The door logic never hard-codes a format; it talks to these interfaces.
 
 ## Legal footing (why this is clean)
 
-- OLMS itself: shareware, do **not** disassemble/patch/relicense it.
 - OpenOLMS: original code, written from the **manual + open specs**. QWK, QWKE,
   Blue Wave, JAM, and Hudson are **publicly documented** formats — that's the
   reference material, and it's free to implement.

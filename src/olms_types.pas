@@ -17,9 +17,7 @@
   You should have received a copy of the GNU General Public License
   along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
-  OpenOLMS is a clean-room reimplementation of the OLMS offline-mail door,
-  written from published format specifications and documentation. It contains
-  no code from the original OLMS.
+  Built in Free Pascal from published format specifications.
 }
 unit olms_types;
 { ===========================================================================
@@ -30,8 +28,7 @@ unit olms_types;
   QWKE / Blue Wave later) consume this via IPacketWriter, so door logic never
   hard-codes a packet format.
 
-  Clean-room: modelled from the OLMS manual's concepts and the open packet
-  specs, not from the original binary.
+  Built in Free Pascal from published format specifications.
   =========================================================================== }
 
 {$MODE OBJFPC}{$H+}

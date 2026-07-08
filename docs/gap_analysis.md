@@ -1,6 +1,6 @@
 # OpenOLMS vs. original OLMS — gap analysis
 
-*Original feature set from `OLMS.DOC` (can't/​won't disassemble the binary — the
+*Original feature set from `OLMS.DOC` (the
 manual is the reference). OpenOLMS state from our actual source. Status per item:
 **[done] · [partial] · [missing]**. Ordered by how much it unblocks the next work.*
 

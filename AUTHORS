@@ -3,13 +3,9 @@ OpenOLMS authors and credits.
 Author / maintainer:
   Antonio Rico / Ecstasy BBS  (github.com/verta1878)
 
-Clean-room reimplementation of the OLMS offline-mail door. OpenOLMS contains no
-code from the original OLMS (Multiboard Communications, shareware); it is written
-from published format specifications and the OLMS manual.
-
-Format specifications referenced (their respective authors):
+Built in Free Pascal from published format specifications:
   QWK        - Mark "Sparky" Herring
   QWKE       - community extension spec
   Blue Wave  - Cutting Edge Computing
-  JAM        - Joaquim Homrighausen, Andrew Adams, Mats Birch^H Lentz, Mats Wittel
+  JAM        - Joaquim Homrighausen, Andrew Adams, Mats Lentz, Mats Wittel
   Hudson     - QuickBBS / RemoteAccess community format

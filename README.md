@@ -1,10 +1,8 @@
 # OpenOLMS
 
-An open-source, clean-room reimplementation of **OLMS** — the QWK / QWKE /
-Blue Wave offline-mail door for DOS bulletin board systems (originally by
-Multiboard Communications). OpenOLMS speaks the same formats and fills the same
-role, written entirely from **published format specifications** and the OLMS
-**manual** — it contains no code from the original program.
+An open-source **OLMS** — a QWK / QWKE / Blue Wave offline-mail door for DOS
+bulletin board systems. Built in Free Pascal from published format
+specifications.
 
 Written in Free Pascal. Runs as two programs, like the original:
 
@@ -76,15 +74,7 @@ pointers/limits, three packet formats, archiver compression, reply intake, file
 requests, networking/gateway, both programs, and the console + SDL UI backends.
 See `STATUS.md` for the full feature list and what a production polish would add.
 
-## Legal
-
-OpenOLMS is original work under the **GPL-3.0-or-later**. It is a clean-room
-reimplementation from open specs (QWK/QWKE/Blue Wave/JAM/Hudson) and the OLMS
-manual; the original OLMS binary was never disassembled. "OLMS" is used only to
-describe the software OpenOLMS is compatible with.
 
 ## Credits
 
-Built by Antonio Rico / Ecstasy BBS. Format specifications by their respective
-authors (QWK by Mark Herring; JAM by Homrighausen/Adams/Lentz/Wittel; Blue Wave
-by Cutting Edge Computing; and the QWKE and Hudson community specs).
+Built by Antonio Rico / Ecstasy BBS.
