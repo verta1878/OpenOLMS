@@ -2,6 +2,20 @@
 
 All notable changes to OpenOLMS. Format: [Keep a Changelog](https://keepachangelog.com/).
 
+## [0.2] - 2026-07-08
+
+### Fixed
+- CONFIG.EXE is now a real interactive editor: loads OLMS.CFG, lets the sysop
+  edit System Information / Archiver / Limits on live screens, and saves. (0.1
+  shipped a render-only demo by mistake.)
+- Archiver now reports true success/failure: it verifies the .QWK was actually
+  produced instead of trusting the DOS COMMAND.COM exit code, which reported
+  success even when the archiver (e.g. PKZIP) was not found.
+
+### Added
+- Live CRT screen backend (olms_screen_crt) for interactive DOS console editing.
+
+
 ## [Unreleased]
 
 Initial implementation of the OLMS offline-mail door.

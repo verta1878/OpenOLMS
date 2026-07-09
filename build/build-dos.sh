@@ -17,8 +17,8 @@ export PATH=/usr/local/bin:$PATH
 echo "Building OLMS.EXE ..."
 "$CROSS" -Tgo32v2 -O2 $RTLOPT -FE. olms.pas
 echo "Building CONFIG.EXE ..."
-"$CROSS" -Tgo32v2 -O2 $RTLOPT -FE. config_demo.pas
+"$CROSS" -Tgo32v2 -O2 $RTLOPT -FE. config.pas
 [ -f olms.exe ] && mv -f olms.exe OLMS.EXE
-[ -f config_demo.exe ] && mv -f config_demo.exe CONFIG.EXE
+[ -f config.exe ] && mv -f config.exe CONFIG.EXE
 rm -f *.o *.ppu
 echo "Done: OLMS.EXE and CONFIG.EXE  (ship with dos-runtime/CWSDPMI.EXE)"

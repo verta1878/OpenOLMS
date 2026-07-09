@@ -24,7 +24,7 @@ sh build/build-linux.sh
 # or manually:
 cd src
 fpc -O2 olms.pas          # -> olms
-fpc -O2 config_demo.pas   # -> config_demo  (rename to 'config' if you like)
+fpc -O2 config.pas   # -> config  (rename to 'config' if you like)
 ```
 
 Run it the way a BBS would (a dropfile + a JAM base in the directory):

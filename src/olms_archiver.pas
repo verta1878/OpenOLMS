@@ -198,11 +198,17 @@ begin
       until SysUtils.FindNext(sr) <> 0;
       SysUtils.FindClose(sr);
     end;
+    // delete any stale archive so existence-after is a true success signal
+    if FileExists(ArchivePath) then DeleteFile(ArchivePath);
     Result := RunTemplate(Cfg.Archivers[ai].Compress, ArchivePath, PacketDir, fl);
   finally
     fl.Free;
   end;
-  if not Result.Success then Result.Success := FileExists(ArchivePath);
+  // ground truth: the archive really exists (COMSPEC exit codes can lie on DOS)
+  Result.Success := FileExists(ArchivePath);
+  if not Result.Success and (Result.Output = '') then
+    Result.Output := 'archiver did not produce ' + ArchivePath +
+                     ' (is the archiver program on the PATH?)';
 end;
 
 function ExtractReply(const Cfg: TOlmsConfig; const Tag, ArchivePath,
