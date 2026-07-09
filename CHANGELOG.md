@@ -2,6 +2,18 @@
 
 All notable changes to OpenOLMS. Format: [Keep a Changelog](https://keepachangelog.com/).
 
+## [0.4] - 2026-07-09
+
+### Fixed
+- CONFIG.EXE: fixed duplicated field labels / one-row screen shift on DOS.
+  Writing a full-width bar to the bottom row scrolled the whole DOS screen up;
+  the CRT backend no longer writes the bottom-right corner cell, and all bars
+  are trimmed to Cols-1 so nothing reaches the scroll edge.
+- DOS text files (README.TXT, FILE_ID.DIZ, OLMS.CFG, DORINFO1.DEF) now use
+  DOS CRLF line endings so they display correctly in DOS/Notepad instead of
+  running together as one block. Rewrote README.TXT with clear sections.
+- Added .gitattributes to keep DOS text files as CRLF going forward.
+
 ## [0.3] - 2026-07-09
 
 ### Added

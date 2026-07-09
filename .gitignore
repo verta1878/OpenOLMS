@@ -30,3 +30,4 @@ ppas.sh
 
 # Mystic SDL font (needed by the SDL UI backend)
 !src/mystic_sdl/VGA8X16.FNT
+src/*.EXE

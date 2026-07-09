@@ -1,0 +1,26 @@
+==============================================================================
+ OpenOLMS - TODO / ROADMAP
+==============================================================================
+
+PLANNED
+  - Interactive front-end: a menu-driven UI when OLMS is run for a caller
+    (conference select, read/scan, pack, upload) - matching the classic OLMS
+    screens.
+  - Local mode: run OLMS at the console as the sysop (no dropfile) to grab or
+    test your own mail.
+  - Read RemoteAccess CONFIG.RA to auto-fill system / sysop names and areas.
+  - File uploaded replies back INTO the message base (currently parsed only).
+
+NICE TO HAVE
+  - More archivers preconfigured (ARJ, LHA, ZIP variants).
+  - Reader-compatibility testing against MultiMail / Blue Wave / etc.
+  - Internet / QWKnet gateway polish.
+
+KNOWN LIMITATIONS
+  - The graphical SDL config UI is for modern OSes (Windows/Linux/macOS) only;
+    real DOS uses the text (CRT) config UI.
+  - Tested primarily via the identical Linux build plus DOS smoke tests;
+    please report issues at github.com/verta1878/OpenOLMS
+
+Have a request or a bug? Open an issue on GitHub. Thanks for trying OpenOLMS.
+==============================================================================

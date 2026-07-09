@@ -2,7 +2,7 @@ unit olms_screen_crt;
 {
   OpenOLMS - live console screen backend (Crt)
   SPDX-License-Identifier: GPL-3.0-or-later
-  Copyright (C) 2026  Antonio Rico / Ecstasy BBS (github.com/verta1878)
+  Copyright (C) 2026  Antonio Rico - Ecstasy BBS / Reapern66
   Distributed under the GNU General Public License v3 or later. See LICENSE.
   Built in Free Pascal from published format specifications.
 }
@@ -59,6 +59,8 @@ end;
 procedure TCrtScreen.PutCh(X, Y: Integer; Ch: Char; Fg, Bg: Byte);
 begin
   if (X < 0) or (X >= FCols) or (Y < 0) or (Y >= FRows) then Exit;
+  // Writing the bottom-right cell makes DOS scroll the whole screen up; skip it.
+  if (X = FCols-1) and (Y = FRows-1) then Exit;
   GotoXY(X+1, Y+1);            // CRT is 1-based
   TextColor(Fg and 15);
   TextBackground(Bg and 7);
@@ -75,6 +77,9 @@ begin
   TextBackground(Bg and 7);
   n := Length(S);
   if X + n > FCols then n := FCols - X;   // clip to width (avoid wrap/scroll)
+  // On the LAST row, never write the final column: writing the bottom-right
+  // cell scrolls the whole DOS screen up by one line.
+  if (Y = FRows-1) and (X + n >= FCols) then n := FCols - 1 - X;
   for i := 1 to n do Write(S[i]);
 end;
 

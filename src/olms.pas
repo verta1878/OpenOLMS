@@ -2,7 +2,7 @@
   OpenOLMS - mail door (main program)
   SPDX-License-Identifier: GPL-3.0-or-later
 
-  Copyright (C) 2026  Antonio Rico / Ecstasy BBS (github.com/verta1878)
+  Copyright (C) 2026  Antonio Rico - Ecstasy BBS / Reapern66
 
   This program is free software: you can redistribute it and/or modify
   it under the terms of the GNU General Public License as published by
@@ -247,6 +247,26 @@ begin
   if O.ResetSel then Writeln('                  reset pointers: selected areas', BackStr(O.ResetBack));
 end;
 
+procedure ShowHelp;
+begin
+  Writeln('Usage: OLMS [switches]   (run as a BBS door)');
+  Writeln('  /D  /U        auto download / upload new mail');
+  Writeln('  /DA /UA       ... without waits    /DL /UL  ... with logoff');
+  Writeln('  /DQ /UQ       ... with ask-logoff');
+  Writeln('  add R         return to OLMS instead of the BBS (e.g. /DAR)');
+  Writeln('  /L            interactive with fewer prompts');
+  Writeln('  /V            pack ALL users vacation mail (run at an event)');
+  Writeln('  /M            vacation mail interface for the user');
+  Writeln('  /MD /MDA...   vacation interface + download');
+  Writeln('  /NT           do not deduct the user''s time');
+  Writeln('  /RG /RS[=n]   reset message pointers (all / selected; back n)');
+  Writeln('  /P=name       load user from USERS.BBS (put first)');
+  Writeln('  --dir <path>  working directory (default: current)');
+  Writeln('  /?            this help    --version  show version');
+  Writeln;
+  Writeln('Use CONFIG.EXE to view or edit the configuration (OLMS.CFG).');
+end;
+
 begin
   dir := GetCurrentDir;
   for i := 1 to ParamCount do
@@ -257,20 +277,7 @@ begin
     if (ParamStr(i) = '--help') or (ParamStr(i) = '-h') or (ParamStr(i) = '/?') then
     begin
       Writeln(OLMS_BANNER);
-      Writeln('Usage: OLMS [switches]   (run as a BBS door)');
-      Writeln('  /D  /U        auto download / upload new mail');
-      Writeln('  /DA /UA       ... without waits    /DL /UL  ... with logoff');
-      Writeln('  /DQ /UQ       ... with ask-logoff');
-      Writeln('  add R         return to OLMS instead of the BBS (e.g. /DAR)');
-      Writeln('  /L            interactive with fewer prompts');
-      Writeln('  /V            pack ALL users vacation mail (run at an event)');
-      Writeln('  /M            vacation mail interface for the user');
-      Writeln('  /MD /MDA...   vacation interface + download');
-      Writeln('  /NT           do not deduct the user''s time');
-      Writeln('  /RG /RS[=n]   reset message pointers (all / selected; back n)');
-      Writeln('  /P=name       load user from USERS.BBS (put first)');
-      Writeln('  --dir <path>  working directory (default: current)');
-      Writeln('  /?            this help    --version  show version');
+      ShowHelp;
       Halt(0);
     end;
   end;
@@ -282,24 +289,27 @@ begin
     cfg.Load(IncludeTrailingPathDelimiter(dir) + 'OLMS.CFG');   // defaults if absent
     ParseDoorArgs(opts);
     ReadDropfile(dir, sess);
-    ShowSession(sess, opts);
     logg.Log('start: user=' + sess.UserName + ' action=' + IntToStr(Ord(opts.Action)));
 
-    Writeln;
     case opts.Action of
       daDownload:
         begin
+          ShowSession(sess, opts);
+          Writeln;
           Writeln('Download: scanning message areas...');
           if RunScan(dir, sess) then ExitCode := 0 else ExitCode := 1;
         end;
       daUpload:
         begin
+          ShowSession(sess, opts);
+          Writeln;
           Writeln('Upload: processing replies...');
           if RunUpload(dir, sess) then ExitCode := 0 else ExitCode := 1;
         end;
     else
-      Writeln('Interactive mode: (menu UI not used when run as an auto door).');
-      Writeln('Use /DA to download or /UA to upload.');
+      // Bare run (no switches): show the command line so the sysop sees the
+      // options. CONFIG.EXE views/edits OLMS.CFG.
+      ShowHelp;
       ExitCode := 0;
     end;
   finally

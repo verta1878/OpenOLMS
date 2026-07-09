@@ -2,7 +2,7 @@
   OpenOLMS - text-mode UI framework
   SPDX-License-Identifier: GPL-3.0-or-later
 
-  Copyright (C) 2026  Antonio Rico / Ecstasy BBS (github.com/verta1878)
+  Copyright (C) 2026  Antonio Rico - Ecstasy BBS / Reapern66
 
   This program is free software: you can redistribute it and/or modify
   it under the terms of the GNU General Public License as published by

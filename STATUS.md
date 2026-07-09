@@ -1,4 +1,4 @@
-# OpenOLMS — COMPLETE (Phases 1-16)
+# OpenOLMS 0.4 — status
 
 An OLMS offline-mail door. ~4,000 lines of Free Pascal, 22 units, both programs.
 Built in Free Pascal from published format specifications (QWK/QWKE/Blue Wave/

@@ -1,5 +1,10 @@
 # OpenOLMS
 
+**Version 0.4** · GPLv3 · Free Pascal (DOS/go32v2 + modern)
+
+Author: Antonio Rico - Ecstasy BBS / Reapern66
+Source: https://github.com/verta1878/OpenOLMS
+
 An open-source **OLMS** — a QWK / QWKE / Blue Wave offline-mail door for DOS
 bulletin board systems. Built in Free Pascal from published format
 specifications.

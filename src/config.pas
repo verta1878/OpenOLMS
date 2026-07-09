@@ -2,7 +2,7 @@ program config;
 {
   OpenOLMS - sysop configuration tool (main program)
   SPDX-License-Identifier: GPL-3.0-or-later
-  Copyright (C) 2026  Antonio Rico / Ecstasy BBS (github.com/verta1878)
+  Copyright (C) 2026  Antonio Rico - Ecstasy BBS / Reapern66
   Distributed under the GNU General Public License v3 or later. See LICENSE.
   Built in Free Pascal from published format specifications.
 }
@@ -37,7 +37,7 @@ var
 
 procedure Bar(Y: Integer; const S: string; Fg, Bg: Byte);
 begin
-  scr.PutStr(0, Y, StringOfChar(' ', scr.Cols), Fg, Bg);
+  scr.PutStr(0, Y, StringOfChar(' ', scr.Cols-1), Fg, Bg);
   scr.PutStr(2, Y, S, Fg, Bg);
 end;
 
@@ -61,7 +61,7 @@ begin
   field := 0; done := False;
   repeat
     scr.Clear(clBlue);
-    scr.PutStr(0,0, StringOfChar(' ',scr.Cols), clBlack, clCyan);
+    scr.PutStr(0,0, StringOfChar(' ',scr.Cols-1), clBlack, clCyan);
     scr.PutStr(2,0,'OpenOLMS Configuration', clBlack, clCyan);
     scr.PutStr(scr.Cols-14,0,'System Info', clBlack, clCyan);
     DrawTitledBox(scr as IScreen, 8,3,64,16,'System Information', clLightCyan, clBlue, clYellow, bsDouble);
@@ -100,7 +100,7 @@ begin
   repeat
     scr.Clear(clBlue);
     scr.PutStr(2,0,'OpenOLMS Configuration', clBlack, clCyan);
-    scr.PutStr(0,0,StringOfChar(' ',scr.Cols),clBlack,clCyan);
+    scr.PutStr(0,0,StringOfChar(' ',scr.Cols-1),clBlack,clCyan);
     scr.PutStr(2,0,'OpenOLMS Configuration', clBlack, clCyan);
     scr.PutStr(scr.Cols-12,0,'Archiver', clBlack, clCyan);
     DrawTitledBox(scr as IScreen, 4,3,scr.Cols-8,14,'Archiver Programs', clLightCyan, clBlue, clYellow, bsDouble);
@@ -139,7 +139,7 @@ begin
   repeat
     scr.Clear(clBlue);
     scr.PutStr(2,0,'Edit Message Area', clBlack, clCyan);
-    scr.PutStr(0,0,StringOfChar(' ',scr.Cols),clBlack,clCyan);
+    scr.PutStr(0,0,StringOfChar(' ',scr.Cols-1),clBlack,clCyan);
     scr.PutStr(2,0,'Edit Message Area', clBlack, clCyan);
     DrawTitledBox(scr as IScreen, 10,4,58,14,'Area', clLightCyan, clBlue, clYellow, bsDouble);
     scr.PutStr(13,6, 'Number   :', clLightGray, clBlue); scr.PutStr(26,6, num, clWhite, clBlue);
@@ -179,7 +179,7 @@ begin
   sel := 0; top := 0; done := False;
   repeat
     scr.Clear(clBlue);
-    scr.PutStr(0,0,StringOfChar(' ',scr.Cols),clBlack,clCyan);
+    scr.PutStr(0,0,StringOfChar(' ',scr.Cols-1),clBlack,clCyan);
     scr.PutStr(2,0,'OpenOLMS Configuration', clBlack, clCyan);
     scr.PutStr(scr.Cols-16,0,'Message Areas', clBlack, clCyan);
     DrawTitledBox(scr as IScreen, 3,2,scr.Cols-6,scr.Rows-4,'Message Areas', clLightCyan, clBlue, clYellow, bsDouble);
@@ -230,7 +230,7 @@ function MenuChoice: Integer;
 var k: TKey;
 begin
   scr.Clear(clBlue);
-  scr.PutStr(0,0,StringOfChar(' ',scr.Cols),clBlack,clCyan);
+  scr.PutStr(0,0,StringOfChar(' ',scr.Cols-1),clBlack,clCyan);
   scr.PutStr(2,0,'OpenOLMS Configuration', clBlack, clCyan);
   DrawTitledBox(scr as IScreen, 24,3,32,15,'Configuration', clLightCyan, clBlue, clYellow, bsDouble);
   scr.PutStr(28,6, '(1) System Information', clLightGray, clBlue);
@@ -258,7 +258,7 @@ begin
   mc := IntToStr(cfg.Limits.MaxConfs); field := 0; done := False;
   repeat
     scr.Clear(clBlue);
-    scr.PutStr(0,0,StringOfChar(' ',scr.Cols),clBlack,clCyan);
+    scr.PutStr(0,0,StringOfChar(' ',scr.Cols-1),clBlack,clCyan);
     scr.PutStr(2,0,'OpenOLMS Configuration', clBlack, clCyan);
     DrawTitledBox(scr as IScreen, 12,4,56,12,'Limits Setup', clLightCyan, clBlue, clYellow, bsDouble);
     scr.PutStr(15,6, 'Max messages / packet :', clLightGray, clBlue); scr.PutStr(40,6, mm, clWhite, clBlue);

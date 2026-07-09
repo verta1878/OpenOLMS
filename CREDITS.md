@@ -1,7 +1,7 @@
 # Credits
 
 ## OpenOLMS
-Author / maintainer: Antonio Rico / Ecstasy BBS (github.com/verta1878).
+Author / maintainer: Antonio Rico - Ecstasy BBS / Reapern66.
 
 ## Mystic BBS UI components
 OpenOLMS's configuration interface reuses text-mode UI code from **Mystic BBS**,

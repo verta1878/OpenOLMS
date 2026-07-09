@@ -1,0 +1,31 @@
+==============================================================================
+ OpenOLMS - WHAT'S NEW
+==============================================================================
+
+0.4
+  - Readable DOS docs: text files now use DOS (CRLF) line endings so they
+    display correctly in DOS/Notepad; README.TXT rewritten in clear sections.
+  - CONFIG.EXE: fixed duplicated field labels / one-row screen shift (caused
+    by a DOS bottom-of-screen scroll).
+  - OLMS.EXE with no switches now prints the command-line options.
+  - Added TODO.TXT, INSTALL.TXT, WHATSNEW.TXT.
+
+0.3
+  - Scans MULTIPLE message areas (JAM and Hudson); set them in CONFIG.EXE.
+  - CONFIG.EXE Message Areas editor (add / edit / delete areas).
+  - Honest archiver reporting (no false "compressed" when PKZIP is missing).
+  - Proper exit codes (0 = ok, 1 = error) for BBS batch files.
+  - Activity logging to OLMS.LOG.
+  - /U processes uploaded <BoardID>.REP reply packets.
+  - Full OLMS command-line switch set; DOS /? help; --version.
+  - BBS identity (system / sysop / board id) read from OLMS.CFG.
+
+0.2
+  - CONFIG.EXE became a real interactive editor (loads / edits / saves
+    OLMS.CFG), replacing an earlier render-only demo.
+  - Archiver now verifies the .QWK was actually produced.
+
+0.1
+  - First release: QWK / QWKE / Blue Wave offline-mail door for DOS.
+    Free Pascal (go32v2), GPLv3.
+==============================================================================

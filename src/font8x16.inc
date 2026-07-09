@@ -1,7 +1,7 @@
 {
   OpenOLMS - 8x16 cell font data (include)
   SPDX-License-Identifier: GPL-3.0-or-later
-  Copyright (C) 2026  Antonio Rico / Ecstasy BBS (github.com/verta1878)
+  Copyright (C) 2026  Antonio Rico - Ecstasy BBS / Reapern66
   Distributed under the GNU General Public License v3 or later.
   See the LICENSE file. Built in Free Pascal from published format specifications.
 }
