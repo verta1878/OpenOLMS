@@ -9,3 +9,7 @@ Built in Free Pascal from published format specifications:
   Blue Wave  - Cutting Edge Computing
   JAM        - Joaquim Homrighausen, Andrew Adams, Mats Lentz, Mats Wittel
   Hudson     - QuickBBS / RemoteAccess community format
+
+UI components reused from Mystic BBS:
+  Mystic BBS - Copyright 1997-2013 By James Coyle (g00r00), GPLv3.
+  https://www.mysticbbs.com/  -  thanks to g00r00 for releasing Mystic as GPL.

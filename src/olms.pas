@@ -40,7 +40,8 @@ program olms;
 
 uses
   SysUtils, olms_types, olms_qwk, olms_config, olms_door, olms_msgbase,
-  olms_archiver, olms_filter, olms_pointers;
+  olms_hudson, olms_rep, olms_archiver, olms_filter, olms_pointers,
+  olms_runtime, olms_ver;
 
 var
   cfg  : TOlmsConfig;
@@ -48,86 +49,171 @@ var
   opts : TDoorOptions;
   dir  : string;
   i    : Integer;
+  logg : TOlmsLog;
 
-{ Scan a JAM base and build a QWK packet for the session — the real door job. }
+{ Open the right reader for an area; nil if the base isn't present. }
+function OpenAreaReader(const Dir: string; const A: TMsgArea): IMsgBase;
+var jam: TJamReader; hud: THudsonReader; base: string;
+begin
+  Result := nil;
+  base := A.Path;
+  // absolute if it has a drive (X:) or starts with a path separator
+  if not ((Length(base) >= 2) and (base[2] = ':')) and
+     not ((Length(base) >= 1) and ((base[1] = '\') or (base[1] = '/'))) then
+    base := IncludeTrailingPathDelimiter(Dir) + base;
+  if A.Kind = akJAM then
+  begin
+    if not FileExists(base + '.JHR') then Exit;
+    jam := TJamReader.Create;
+    if jam.Open(base) then Result := jam else jam.Free;
+  end
+  else
+  begin
+    hud := THudsonReader.Create;
+    if hud.OpenBase(ExtractFilePath(base + '.'), A.Board) then Result := hud else hud.Free;
+  end;
+end;
+
+{ Scan all configured message areas and build a QWK packet for the session. }
 function RunScan(const Dir: string; const S: TDoorSession): Boolean;
 var
   reader : IMsgBase;
   P : TOlmsPacket; c : TOlmsConference; m : TOlmsMessage;
   w : IPacketWriter;
-  basePath : string;
-  idx, got : Integer;
+  idx, gotArea, gotTotal, ai : Integer;
   arc : TArchiveResult;
   filt : TFilterSet;
   ptrs : TPointerStore;
   guard : TLimitGuard;
   lastMsg, highSeen : LongInt;
+  user, qwkPath : string;
 begin
   Result := False;
-  basePath := IncludeTrailingPathDelimiter(Dir) + 'GENERAL';   // demo area
-  if not FileExists(basePath + '.JHR') then
-  begin
-    Writeln('  (no JAM base at ', basePath, '.JHR — nothing to scan)');
-    Exit;
-  end;
-  reader := TJamReader.Create;
-  if not reader.Open(basePath) then begin Writeln('  JAM open failed'); Exit; end;
+  if S.Valid then user := S.UserName else user := 'SYSOP';
+  if opts.ForcedUser <> '' then user := opts.ForcedUser;
+
+  filt := TFilterSet.Create;
+  filt.LoadFromFile(IncludeTrailingPathDelimiter(Dir) + 'FILTER.CFG');
+  ptrs := TPointerStore.Create;
+  ptrs.Load(IncludeTrailingPathDelimiter(Dir) + 'POINTERS.DAT');
+  guard := TLimitGuard.Create(cfg.Limits);
 
   P := TOlmsPacket.Create;
   try
-    P.Info.BBSName := 'Ecstasy BBS'; P.Info.BBSID := 'ECSTASY';
-    P.Info.SysopName := 'reapern66';
-    if S.Valid then P.Info.UserName := S.UserName else P.Info.UserName := 'SYSOP';
-    P.Info.Serial := 'OPENOLMS';
-    c := P.AddConference(1, 'General');
-    got := 0;
-    filt := TFilterSet.Create;
-    filt.LoadFromFile(IncludeTrailingPathDelimiter(Dir) + 'FILTER.CFG');  // optional
-    ptrs := TPointerStore.Create;
-    ptrs.Load(IncludeTrailingPathDelimiter(Dir) + 'POINTERS.DAT');
-    guard := TLimitGuard.Create(cfg.Limits);
-    lastMsg := ptrs.GetPointer(P.Info.UserName, 1);
-    highSeen := lastMsg;
-    for idx := 0 to reader.MessageCount-1 do
+    P.Info.BBSName   := cfg.Sys.SystemName;
+    P.Info.SysopName := cfg.Sys.SysopName;
+    P.Info.BBSID     := cfg.Sys.BoardID; if P.Info.BBSID = '' then P.Info.BBSID := 'PACKET';
+    P.Info.Phone     := cfg.Sys.Phone;
+    P.Info.UserName  := user;
+    P.Info.Serial    := OLMS_NAME + ' ' + OLMS_VERSION;
+
+    gotTotal := 0;
+    for ai := 0 to cfg.AreaCount-1 do
     begin
-      m := TOlmsMessage.Create;
-      if reader.ReadMessage(idx, m) then
+      if not cfg.Areas[ai].Active then Continue;
+      reader := OpenAreaReader(Dir, cfg.Areas[ai]);
+      if reader = nil then
       begin
-        m.ConfNum := 1;
-        if (m.MsgNum > lastMsg) and filt.ShouldInclude(m) and guard.CanAdd(m) then
+        logg.Verbose('area ' + IntToStr(cfg.Areas[ai].Number) + ' (' +
+                     cfg.Areas[ai].Name + '): base not found, skipped');
+        Continue;
+      end;
+      c := P.AddConference(cfg.Areas[ai].Number, cfg.Areas[ai].Name);
+      lastMsg := ptrs.GetPointer(user, cfg.Areas[ai].Number);
+      highSeen := lastMsg;
+      gotArea := 0;
+      for idx := 0 to reader.MessageCount-1 do
+      begin
+        m := TOlmsMessage.Create;
+        if reader.ReadMessage(idx, m) then
         begin
-          c.AddMessage(m); guard.Added(m); Inc(got);
-          if m.MsgNum > highSeen then highSeen := m.MsgNum;
+          m.ConfNum := cfg.Areas[ai].Number;
+          if (m.MsgNum > lastMsg) and filt.ShouldInclude(m) and guard.CanAdd(m) then
+          begin
+            c.AddMessage(m); guard.Added(m); Inc(gotArea); Inc(gotTotal);
+            if m.MsgNum > highSeen then highSeen := m.MsgNum;
+          end
+          else m.Free;
         end
         else m.Free;
-      end
-      else m.Free;
+      end;
+      ptrs.SetPointer(user, cfg.Areas[ai].Number, highSeen);
+      reader.Close;
+      Writeln('  area ', cfg.Areas[ai].Number:3, ' ', cfg.Areas[ai].Name,
+              ': ', gotArea, ' new');
+      logg.Log('area ' + IntToStr(cfg.Areas[ai].Number) + ' ' + cfg.Areas[ai].Name +
+               ': ' + IntToStr(gotArea) + ' new for ' + user);
     end;
-    ptrs.SetPointer(P.Info.UserName, 1, highSeen);   // advance read pointer
     ptrs.Save;
-    guard.Free; ptrs.Free; filt.Free;
-    reader.Close;
-    Writeln('  scanned ', got, ' NEW message(s) (pointer was ', lastMsg,
-            ', now ', highSeen, ', after filters+limits)');
+
+    Writeln('  ', gotTotal, ' new message(s) across ', P.Count, ' area(s)');
+    if gotTotal = 0 then
+    begin
+      Writeln('  nothing new to pack.');
+      logg.Log(user + ': no new mail');
+      Exit(True);
+    end;
 
     w := TQwkWriter.Create;
-    Result := w.WritePacket(P, IncludeTrailingPathDelimiter(Dir) + 'packet');
-    if Result then
+    if not w.WritePacket(P, IncludeTrailingPathDelimiter(Dir) + 'packet') then
+    begin Writeln('  packet write failed'); Exit(False); end;
+    Writeln('  wrote ', w.FormatName, ' packet');
+
+    qwkPath := IncludeTrailingPathDelimiter(Dir) + P.Info.BBSID + '.QWK';
+    arc := CompressPacket(cfg, cfg.Archivers[0].Tag,
+             IncludeTrailingPathDelimiter(Dir) + 'packet', qwkPath);
+    if arc.Success then
     begin
-      Writeln('  wrote ', w.FormatName, ' packet -> ', Dir, PathDelim, 'packet');
-      // compress into <BBSID>.QWK using the configured archiver
-      arc := CompressPacket(cfg, 'ZIP',
-               IncludeTrailingPathDelimiter(Dir) + 'packet',
-               IncludeTrailingPathDelimiter(Dir) + P.Info.BBSID + '.QWK');
-      if arc.Success then
-        Writeln('  compressed -> ', P.Info.BBSID, '.QWK  (ready for download)')
-      else
-        Writeln('  archiver note: ', arc.Output, '  [', arc.Command, ']');
+      Writeln('  compressed -> ', P.Info.BBSID, '.QWK  (ready for download)');
+      logg.Log(user + ': packed ' + IntToStr(gotTotal) + ' msgs -> ' + P.Info.BBSID + '.QWK');
+      Result := True;
     end
     else
-      Writeln('  packet write failed');
+    begin
+      Writeln('  ARCHIVER FAILED: ', arc.Output);
+      Writeln('  (set your archiver in CONFIG.EXE; PKZIP/PKUNZIP must be on the PATH)');
+      logg.Log(user + ': ARCHIVER FAILED - ' + arc.Output);
+      Result := False;
+    end;
   finally
-    P.Free;
+    guard.Free; ptrs.Free; filt.Free; P.Free;
+  end;
+end;
+
+{ /U upload: extract the caller's <BBSID>.REP and report the replies. }
+function RunUpload(const Dir: string; const S: TDoorSession): Boolean;
+var
+  repPath, msgPath, user : string;
+  arc : TArchiveResult;
+  rep : TRepReader;
+  R : TOlmsPacket; n : Integer;
+begin
+  Result := False;
+  if S.Valid then user := S.UserName else user := 'SYSOP';
+  repPath := IncludeTrailingPathDelimiter(Dir) + cfg.Sys.BoardID + '.REP';
+  if not FileExists(repPath) then
+  begin
+    Writeln('  no reply packet (', cfg.Sys.BoardID, '.REP) found.');
+    Exit(True);
+  end;
+  arc := ExtractReply(cfg, cfg.Archivers[0].Tag, repPath,
+                      IncludeTrailingPathDelimiter(Dir) + 'rep');
+  msgPath := IncludeTrailingPathDelimiter(Dir) + 'rep' + PathDelim + cfg.Sys.BoardID + '.MSG';
+  if not FileExists(msgPath) then
+  begin
+    Writeln('  could not extract replies: ', arc.Output);
+    logg.Log(user + ': reply extract FAILED - ' + arc.Output);
+    Exit(False);
+  end;
+  R := TOlmsPacket.Create;
+  rep := TRepReader.Create;
+  try
+    n := rep.ReadReplies(msgPath, R);
+    Writeln('  read ', n, ' reply/replies from ', user);
+    logg.Log(user + ': uploaded ' + IntToStr(n) + ' replies');
+    Result := True;
+  finally
+    rep.Free; R.Free;
   end;
 end;
 
@@ -154,33 +240,70 @@ begin
   Writeln('Mode            : ', ActName[O.Action], '  (', AftName[O.After], ')');
   if not O.Waits then Writeln('                  no-waits');
   if O.LessPrompts then Writeln('                  less prompts (/L)');
-  if O.Vacation then Writeln('                  vacation mail');
+  if O.VacationPack then Writeln('                  vacation: pack all users');
+  if O.VacationUser then Writeln('                  vacation: user interface');
+  if O.NoTime then Writeln('                  no time deduction (/NT)');
   if O.ResetAll then Writeln('                  reset pointers: all areas', BackStr(O.ResetBack));
   if O.ResetSel then Writeln('                  reset pointers: selected areas', BackStr(O.ResetBack));
 end;
 
 begin
   dir := GetCurrentDir;
-  for i := 1 to ParamCount-1 do
-    if ParamStr(i) = '--dir' then dir := ParamStr(i+1);
+  for i := 1 to ParamCount do
+  begin
+    if (ParamStr(i) = '--dir') and (i < ParamCount) then dir := ParamStr(i+1);
+    if (ParamStr(i) = '--version') or (ParamStr(i) = '-v') then
+    begin Writeln(OLMS_BANNER); Halt(0); end;
+    if (ParamStr(i) = '--help') or (ParamStr(i) = '-h') or (ParamStr(i) = '/?') then
+    begin
+      Writeln(OLMS_BANNER);
+      Writeln('Usage: OLMS [switches]   (run as a BBS door)');
+      Writeln('  /D  /U        auto download / upload new mail');
+      Writeln('  /DA /UA       ... without waits    /DL /UL  ... with logoff');
+      Writeln('  /DQ /UQ       ... with ask-logoff');
+      Writeln('  add R         return to OLMS instead of the BBS (e.g. /DAR)');
+      Writeln('  /L            interactive with fewer prompts');
+      Writeln('  /V            pack ALL users vacation mail (run at an event)');
+      Writeln('  /M            vacation mail interface for the user');
+      Writeln('  /MD /MDA...   vacation interface + download');
+      Writeln('  /NT           do not deduct the user''s time');
+      Writeln('  /RG /RS[=n]   reset message pointers (all / selected; back n)');
+      Writeln('  /P=name       load user from USERS.BBS (put first)');
+      Writeln('  --dir <path>  working directory (default: current)');
+      Writeln('  /?            this help    --version  show version');
+      Halt(0);
+    end;
+  end;
 
   cfg := TOlmsConfig.Create;
+  logg := TOlmsLog.Create(IncludeTrailingPathDelimiter(dir) + 'OLMS.LOG', lmNormal);
   try
-    cfg.Load(IncludeTrailingPathDelimiter(dir) + 'OLMS.CFG');   // ok if absent (defaults)
+    Writeln(OLMS_BANNER);
+    cfg.Load(IncludeTrailingPathDelimiter(dir) + 'OLMS.CFG');   // defaults if absent
     ParseDoorArgs(opts);
     ReadDropfile(dir, sess);
-
     ShowSession(sess, opts);
+    logg.Log('start: user=' + sess.UserName + ' action=' + IntToStr(Ord(opts.Action)));
 
     Writeln;
-    if opts.Action in [daDownload] then
-    begin
-      Writeln('Auto-download: scanning bases and building packet...');
-      RunScan(dir, sess);
-    end
+    case opts.Action of
+      daDownload:
+        begin
+          Writeln('Download: scanning message areas...');
+          if RunScan(dir, sess) then ExitCode := 0 else ExitCode := 1;
+        end;
+      daUpload:
+        begin
+          Writeln('Upload: processing replies...');
+          if RunUpload(dir, sess) then ExitCode := 0 else ExitCode := 1;
+        end;
     else
-      Writeln('[ interactive mode: conference select + menu UI plug in here ]');
+      Writeln('Interactive mode: (menu UI not used when run as an auto door).');
+      Writeln('Use /DA to download or /UA to upload.');
+      ExitCode := 0;
+    end;
   finally
+    logg.Free;
     cfg.Free;
   end;
 end.

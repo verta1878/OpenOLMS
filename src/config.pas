@@ -17,11 +17,21 @@ program config;
 {$MODE OBJFPC}{$H+}
 
 uses
-  SysUtils, olms_ui, olms_screen_crt, olms_input, olms_kbd_console, olms_config;
+  SysUtils, olms_ui, olms_input, olms_config,
+  {$IFDEF USE_SDL}
+  olms_screen_sdl, olms_kbd_sdl;      // modern (Windows/Linux/macOS) - g00r00 SDL engine
+  {$ELSE}
+  olms_screen_crt, olms_kbd_console;  // DOS / text console
+  {$ENDIF}
 
 var
+  {$IFDEF USE_SDL}
+  scr : TSdlScreen;
+  kbd : TSdlKeyboard;
+  {$ELSE}
   scr : TCrtScreen;
   kbd : TConsoleKeyboard;
+  {$ENDIF}
   cfg : TOlmsConfig;
   cfgPath : string;
 
@@ -112,6 +122,110 @@ begin
   cfg.Archivers[0].Compress := comp; cfg.Archivers[0].Decompress := decomp;
 end;
 
+function IfThenB(cond: Boolean; a, b: Byte): Byte;
+begin if cond then Result := a else Result := b; end;
+
+function IfThenAKs(cond: Boolean; const a, b: string): string;
+begin if cond then Result := a else Result := b; end;
+
+{ Edit one area's fields: number, name, type (JAM/Hudson), path, board. }
+procedure EditArea(ix: Integer);
+var k: TKey; field: Integer; done: Boolean;
+    num, nm, path, board: string; kind: TAreaKind;
+begin
+  num := IntToStr(cfg.Areas[ix].Number); nm := cfg.Areas[ix].Name;
+  path := cfg.Areas[ix].Path; board := IntToStr(cfg.Areas[ix].Board);
+  kind := cfg.Areas[ix].Kind; field := 0; done := False;
+  repeat
+    scr.Clear(clBlue);
+    scr.PutStr(2,0,'Edit Message Area', clBlack, clCyan);
+    scr.PutStr(0,0,StringOfChar(' ',scr.Cols),clBlack,clCyan);
+    scr.PutStr(2,0,'Edit Message Area', clBlack, clCyan);
+    DrawTitledBox(scr as IScreen, 10,4,58,14,'Area', clLightCyan, clBlue, clYellow, bsDouble);
+    scr.PutStr(13,6, 'Number   :', clLightGray, clBlue); scr.PutStr(26,6, num, clWhite, clBlue);
+    scr.PutStr(13,8, 'Name     :', clLightGray, clBlue); scr.PutStr(26,8, nm, clWhite, clBlue);
+    scr.PutStr(13,10,'Type     :', clLightGray, clBlue);
+    scr.PutStr(26,10, IfThenAKs(kind=akJAM,'JAM (SPACE to toggle)','Hudson (SPACE to toggle)'), clYellow, clBlue);
+    scr.PutStr(13,12,'Path/base:', clLightGray, clBlue); scr.PutStr(26,12, path, clWhite, clBlue);
+    scr.PutStr(13,14,'Board #  :', clLightGray, clBlue); scr.PutStr(26,14, board, clWhite, clBlue);
+    scr.PutStr(13,16,'(Board # only used for Hudson)', clLightGreen, clBlue);
+    Bar(scr.Rows-1,'TAB=next  SPACE=toggle type  ENTER=save  ESC=cancel', clBlack, clCyan);
+    case field of
+      0: begin scr.PutStr(13,6,'Number   :',clLightGray,clBlue);
+               num := EditField(scr as IScreen, kbd as IKeyboard, 26,6,6, num, clWhite, clBlue, k); end;
+      1: begin scr.PutStr(13,8,'Name     :',clLightGray,clBlue);
+               nm := EditField(scr as IScreen, kbd as IKeyboard, 26,8,25, nm, clWhite, clBlue, k); end;
+      2: begin k := kbd.ReadKey;
+               if (k.Code = kcChar) and (k.Ch = ' ') then
+                 begin if kind=akJAM then kind:=akHudson else kind:=akJAM; end; end;
+      3: begin scr.PutStr(13,12,'Path/base:',clLightGray,clBlue);
+               path := EditField(scr as IScreen, kbd as IKeyboard, 26,12,40, path, clWhite, clBlue, k); end;
+      4: begin scr.PutStr(13,14,'Board #  :',clLightGray,clBlue);
+               board := EditField(scr as IScreen, kbd as IKeyboard, 26,14,6, board, clWhite, clBlue, k); end;
+    end;
+    if k.Code = kcEsc then Exit
+    else if k.Code = kcEnter then done := True
+    else begin Inc(field); if field > 4 then field := 0; end;
+  until done;
+  cfg.Areas[ix].Number := StrToIntDef(num, cfg.Areas[ix].Number);
+  cfg.Areas[ix].Name := nm; cfg.Areas[ix].Kind := kind;
+  cfg.Areas[ix].Path := path; cfg.Areas[ix].Board := StrToIntDef(board, 0);
+  cfg.Areas[ix].Active := True;
+end;
+
+procedure ScreenAreas;
+var k: TKey; sel, i, top: Integer; done: Boolean; kindStr: string;
+begin
+  sel := 0; top := 0; done := False;
+  repeat
+    scr.Clear(clBlue);
+    scr.PutStr(0,0,StringOfChar(' ',scr.Cols),clBlack,clCyan);
+    scr.PutStr(2,0,'OpenOLMS Configuration', clBlack, clCyan);
+    scr.PutStr(scr.Cols-16,0,'Message Areas', clBlack, clCyan);
+    DrawTitledBox(scr as IScreen, 3,2,scr.Cols-6,scr.Rows-4,'Message Areas', clLightCyan, clBlue, clYellow, bsDouble);
+    scr.PutStr(6,4,'Num  Name                      Type    Path', clWhite, clBlue);
+    for i := 0 to cfg.AreaCount-1 do
+    begin
+      if i < top then Continue;
+      if 6 + (i-top) > scr.Rows-6 then Break;
+      if cfg.Areas[i].Kind = akJAM then kindStr := 'JAM' else kindStr := 'Hudson';
+      scr.PutStr(6, 6+(i-top),
+        Format('%-4d %-25s %-7s %s', [cfg.Areas[i].Number,
+               Copy(cfg.Areas[i].Name,1,25), kindStr, Copy(cfg.Areas[i].Path,1,20)]),
+        IfThenB(i=sel, clYellow, clLightGray), clBlue);
+    end;
+    Bar(scr.Rows-1, 'UP/DN select  E=edit  A=add  D=delete  ESC=back', clBlack, clCyan);
+    k := kbd.ReadKey;
+    case k.Code of
+      kcEsc: done := True;
+      kcUp: if sel > 0 then Dec(sel);
+      kcDown: if sel < cfg.AreaCount-1 then Inc(sel);
+      kcChar:
+        case UpCase(k.Ch) of
+          'A': if cfg.AreaCount < MAX_AREAS then
+               begin
+                 FillChar(cfg.Areas[cfg.AreaCount], SizeOf(TMsgArea), 0);
+                 cfg.Areas[cfg.AreaCount].Number := cfg.AreaCount+1;
+                 cfg.Areas[cfg.AreaCount].Name := 'New Area';
+                 cfg.Areas[cfg.AreaCount].Kind := akJAM;
+                 cfg.Areas[cfg.AreaCount].Path := 'AREA' + IntToStr(cfg.AreaCount+1);
+                 cfg.Areas[cfg.AreaCount].Active := True;
+                 sel := cfg.AreaCount; Inc(cfg.AreaCount);
+                 EditArea(sel);
+               end;
+          'E': if cfg.AreaCount > 0 then EditArea(sel);
+          'D': if cfg.AreaCount > 0 then
+               begin
+                 for i := sel to cfg.AreaCount-2 do cfg.Areas[i] := cfg.Areas[i+1];
+                 Dec(cfg.AreaCount);
+                 if sel >= cfg.AreaCount then sel := cfg.AreaCount-1;
+                 if sel < 0 then sel := 0;
+               end;
+        end;
+    end;
+  until done;
+end;
+
 function MenuChoice: Integer;
 var k: TKey;
 begin
@@ -122,6 +236,7 @@ begin
   scr.PutStr(28,6, '(1) System Information', clLightGray, clBlue);
   scr.PutStr(28,8, '(2) Archiver Programs', clLightGray, clBlue);
   scr.PutStr(28,10,'(3) Limits', clLightGray, clBlue);
+  scr.PutStr(28,11,'(4) Message Areas', clLightGray, clBlue);
   scr.PutStr(28,13,'(S) Save and exit', clYellow, clBlue);
   scr.PutStr(28,14,'(Q) Quit without saving', clLightRed, clBlue);
   Bar(scr.Rows-1,'Config: ' + cfgPath, clBlack, clCyan);
@@ -129,7 +244,7 @@ begin
     k := kbd.ReadKey;
     if k.Code = kcChar then
       case UpCase(k.Ch) of
-        '1': Exit(1); '2': Exit(2); '3': Exit(3);
+        '1': Exit(1); '2': Exit(2); '3': Exit(3); '4': Exit(4);
         'S': Exit(100); 'Q': Exit(101);
       end
     else if k.Code = kcEsc then Exit(101);
@@ -176,8 +291,13 @@ begin
   cfg := TOlmsConfig.Create;
   cfg.Load(cfgPath);   // defaults if absent
 
+  {$IFDEF USE_SDL}
+  scr := TSdlScreen.Create('OpenOLMS Configuration');
+  kbd := TSdlKeyboard.Create;
+  {$ELSE}
   scr := TCrtScreen.Create(80, 25);
   kbd := TConsoleKeyboard.Create;
+  {$ENDIF}
   running := True;
   try
     while running do
@@ -187,6 +307,7 @@ begin
         1: ScreenSystemInfo;
         2: ScreenArchiver;
         3: ScreenLimits;
+        4: ScreenAreas;
         100: begin
                if cfg.Save(cfgPath) then
                begin scr.Clear(clBlue); scr.PutStr(2,2,'Saved '+cfgPath, clLightGreen, clBlue); end

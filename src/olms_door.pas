@@ -34,13 +34,17 @@ unit olms_door;
     - EXITINFO.BBS  (RA binary record — stub; DORINFO/DOOR.SYS cover most)
 
   Command-line switches (OLMS.DOC p.19):
-    /U /D          auto upload / download
-    /UA /DA        ... without waits      /UL /DL  ... with logoff
+    /U  /D         auto upload / download
+    /UA /DA        ... without waits
+    /UL /DL        ... with logoff
     /UQ /DQ        ... with ask-logoff
     trailing R     return to interactive OLMS instead of the BBS
     /L             interactive, fewer prompts
-    /V /M[..]      vacation mail
-    /RG /RS[=n]    reset pointers (all / selected areas)
+    /V             pack ALL users' vacation mail (event mode)
+    /M             vacation mail interface for the user
+    /MD /MDA /MDQ /MDL   vacation interface + download (like /D, /DA, ...)
+    /NT            do not deduct the user's time
+    /RG /RS[=n]    reset pointers (all / selected areas; =n resets back n)
     /P=user_name   load user from USERS.BBS instead of a dropfile
   =========================================================================== }
 
@@ -73,7 +77,9 @@ type
     After       : TAfterAction;
     Waits       : Boolean;    // False = the "A" (no waits) variants
     LessPrompts : Boolean;    // /L
-    Vacation    : Boolean;    // /V or /M
+    VacationPack: Boolean;    // /V  - pack ALL users' vacation mail (event mode)
+    VacationUser: Boolean;    // /M  - vacation mail interface for the user
+    NoTime      : Boolean;    // /NT - do not deduct the user's time
     ResetAll    : Boolean;    // /RG
     ResetSel    : Boolean;    // /RS
     ResetBack   : Integer;    // /RG=n or /RS=n  (0 = full)
@@ -176,6 +182,14 @@ var i, eq: Integer; a, up: string;
     else Opts.After := aaReturnBBS;
   end;
 
+  { Apply a download-style action + variants from a switch tail like "AQ" / "LR". }
+  procedure ApplyDLVariant(const tail: string);
+  begin
+    Opts.Action := daDownload;
+    Opts.Waits  := Pos('A', tail) = 0;
+    ApplyAfter(tail);
+  end;
+
 begin
   FillChar(Opts, SizeOf(Opts), 0);
   Opts.Action := daInteractive;
@@ -189,8 +203,12 @@ begin
     up := UpperCase(a);
 
     if Copy(up,1,3) = '/P=' then Opts.ForcedUser := Copy(a, 4, MaxInt)
-    else if (up = '/L') then Opts.LessPrompts := True
-    else if (up = '/V') or (Copy(up,1,2) = '/M') then Opts.Vacation := True
+    else if up = '/NT' then Opts.NoTime := True         // no time deduction
+    else if up = '/L' then Opts.LessPrompts := True
+    else if up = '/V' then Opts.VacationPack := True     // pack all vacation mail
+    else if Copy(up,1,3) = '/MD' then                    // /MD /MDA /MDQ /MDL
+      begin Opts.VacationUser := True; ApplyDLVariant(Copy(up,4,MaxInt)); end
+    else if up = '/M' then Opts.VacationUser := True     // user vacation interface
     else if Copy(up,1,3) = '/RG' then
       begin Opts.ResetAll := True; eq := Pos('=', a); if eq>0 then Opts.ResetBack := StrToIntDef(Copy(a,eq+1,MaxInt),0); end
     else if Copy(up,1,3) = '/RS' then

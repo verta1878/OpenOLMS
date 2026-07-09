@@ -2,6 +2,20 @@
 
 All notable changes to OpenOLMS. Format: [Keep a Changelog](https://keepachangelog.com/).
 
+## [0.3] - 2026-07-09
+
+### Added
+- Multi-area scanning: olms.exe now reads ALL message areas configured in
+  OLMS.CFG (JAM and Hudson), not just one hard-coded base.
+- CONFIG.EXE Message Areas editor (add / edit / delete areas; JAM or Hudson,
+  path, board number).
+- /U upload processing: extracts and reads the caller's <BoardID>.REP replies.
+- Activity logging to OLMS.LOG.
+- Proper exit codes (0 success / 1 failure) for BBS batch files.
+- --version / --help; version banner on startup.
+- BBS identity (system/sysop/board id/phone) now comes from OLMS.CFG.
+- Sysop docs: docs/CONFIGURATION.md and docs/RUNNING.md.
+
 ## [0.2] - 2026-07-08
 
 ### Fixed

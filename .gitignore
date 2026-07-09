@@ -27,3 +27,6 @@ ppas.sh
 !toolchain/units/go32v2/*.ppu
 !toolchain/units/go32v2/*.o
 !toolchain/fpc-3.2.2.source.tar.gz
+
+# Mystic SDL font (needed by the SDL UI backend)
+!src/mystic_sdl/VGA8X16.FNT

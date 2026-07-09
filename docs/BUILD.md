@@ -117,3 +117,17 @@ OLMS.EXE /DA        (with DORINFO1.DEF + a JAM base present)
 | everything else | RTL/FCL | go32v2 RTL |
 
 One tree, two targets, no manual edits — the guards do the switching.
+
+
+## Modern config UI (SDL)
+
+OpenOLMS's config tool can also render in a graphical 80x25 CP437 window on
+Windows/Linux/macOS, using the SDL screen engine from Mystic BBS (TDosScreen by
+James Coyle / g00r00, GPLv3 - in src/mystic_sdl/). Same config.pas as the DOS
+build; the screen/keyboard backend is chosen by the USE_SDL define.
+
+    sh build/build-modern.sh          # -> src/config (SDL UI)
+
+Runtime needs SDL2 (Linux: libSDL2-2.0-0; Windows: SDL2.dll; macOS: libSDL2)
+and VGA8X16.FNT from src/mystic_sdl/ in the working directory. The DOS build
+(build-dos.sh) uses the CRT text backend and needs neither.

@@ -87,3 +87,7 @@ See `STATUS.md` for the full feature list and what a production polish would add
 ## Credits
 
 Built by Antonio Rico / Ecstasy BBS.
+
+Configuration UI components reused from **Mystic BBS** (Copyright 1997-2013 By
+James Coyle / g00r00), used under the GPL v3. Thanks to g00r00 for Mystic BBS
+and for releasing it under the GPL. See CREDITS.md.

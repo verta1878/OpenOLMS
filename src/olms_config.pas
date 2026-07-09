@@ -41,8 +41,20 @@ const
   OLMS_CFG_VERSION = 1;
   MAX_ARCHIVERS    = 8;
   MAX_PROTOCOLS    = 8;
+  MAX_AREAS        = 200;   // message areas (conferences) the door serves
 
 type
+  TAreaKind = (akJAM, akHudson);
+
+  { A message area (conference) the door offers. }
+  TMsgArea = record
+    Number : Word;        // conference number in the packet
+    Name   : string[40];  // display name
+    Kind   : TAreaKind;   // JAM or Hudson
+    Path   : string[80];  // JAM: base path w/o ext; Hudson: dir + board index
+    Board  : Byte;        // Hudson board number (ignored for JAM)
+    Active : Boolean;
+  end;
   { System Information screen (manual p.3). }
   TSysInfo = record
     SystemName : string[60];    // from CONFIG.RA
@@ -83,12 +95,17 @@ type
     Archivers : array[0..MAX_ARCHIVERS-1] of TArchiver;
     Protocols : array[0..MAX_PROTOCOLS-1] of TProtocol;
     Limits    : TLimits;
+    Areas     : array[0..MAX_AREAS-1] of TMsgArea;
+    AreaCount : Integer;
     procedure SetDefaults;
     function  Load(const FileName: string): Boolean;
     function  Save(const FileName: string): Boolean;
   end;
 
 implementation
+
+function IfThenAK(cond: Boolean; const a, b: string): string;
+begin if cond then Result := a else Result := b; end;
 
 procedure TOlmsConfig.SetDefaults;
 var i: Integer;
@@ -114,6 +131,11 @@ begin
   Limits.MaxPacketKB := 500;
   Limits.MaxConfs    := 2000;   // manual: 2000 confs in shareware version
   Limits.MaxTaglines := 10;
+  // default message areas: one JAM area named General
+  for i := 0 to MAX_AREAS-1 do FillChar(Areas[i], SizeOf(TMsgArea), 0);
+  AreaCount := 1;
+  Areas[0].Number := 1; Areas[0].Name := 'General';
+  Areas[0].Kind := akJAM; Areas[0].Path := 'GENERAL'; Areas[0].Active := True;
 end;
 
 { Simple, readable key=value store (easy to diff/hand-edit; both exes parse it). }
@@ -139,6 +161,12 @@ begin
   Writeln(f, 'MaxMessages=', Limits.MaxMessages);
   Writeln(f, 'MaxPacketKB=', Limits.MaxPacketKB);
   Writeln(f, 'MaxConfs=', Limits.MaxConfs);
+  // message areas:  Area=num|name|kind(J/H)|path|board|active
+  for i := 0 to AreaCount-1 do
+    if Areas[i].Name <> '' then
+      Writeln(f, 'Area=', Areas[i].Number, '|', Areas[i].Name, '|',
+                 IfThenAK(Areas[i].Kind = akJAM, 'J', 'H'), '|',
+                 Areas[i].Path, '|', Areas[i].Board, '|', Ord(Areas[i].Active));
   CloseFile(f);
   Result := True;
 end;
@@ -147,6 +175,7 @@ function TOlmsConfig.Load(const FileName: string): Boolean;
 var
   f: TextFile; line, key, val: string; p, ai: Integer;
   parts: TStringList;
+  areasSeen: Boolean;
 begin
   Result := False;
   SetDefaults;
@@ -154,7 +183,7 @@ begin
   AssignFile(f, FileName);
   {$I-} Reset(f); {$I+}
   if IOResult <> 0 then Exit;
-  ai := 0;
+  ai := 0; areasSeen := False;
   while not Eof(f) do
   begin
     Readln(f, line);
@@ -185,6 +214,31 @@ begin
           Inc(ai);
         end;
       finally parts.Free; end;
+    end
+    else if key = 'Area' then
+    begin
+      if not areasSeen then begin AreaCount := 0; areasSeen := True; end;
+      if AreaCount < MAX_AREAS then
+      begin
+        parts := TStringList.Create;
+        try
+          parts.Delimiter := '|'; parts.StrictDelimiter := True;
+          parts.DelimitedText := val;
+          if parts.Count >= 4 then
+          begin
+            FillChar(Areas[AreaCount], SizeOf(TMsgArea), 0);
+            Areas[AreaCount].Number := StrToIntDef(parts[0], 0);
+            Areas[AreaCount].Name   := parts[1];
+            if (parts[2] = 'H') or (parts[2] = 'h') then Areas[AreaCount].Kind := akHudson
+                                                    else Areas[AreaCount].Kind := akJAM;
+            Areas[AreaCount].Path := parts[3];
+            if parts.Count >= 5 then Areas[AreaCount].Board  := StrToIntDef(parts[4], 0);
+            if parts.Count >= 6 then Areas[AreaCount].Active := parts[5] = '1'
+                                else Areas[AreaCount].Active := True;
+            Inc(AreaCount);
+          end;
+        finally parts.Free; end;
+      end;
     end;
   end;
   CloseFile(f);
