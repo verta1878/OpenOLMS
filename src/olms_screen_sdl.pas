@@ -2,7 +2,7 @@ unit olms_screen_sdl;
 {
   OpenOLMS - SDL screen backend (IScreen via Mystic's CP437 renderer)
   SPDX-License-Identifier: GPL-3.0-or-later
-  Copyright (C) 2026  Antonio Rico - Ecstasy BBS / Reapern66
+  Copyright (C) 2026  Antonio Rico / Ecstasy BBS (github.com/verta1878)
   Distributed under the GNU General Public License v3 or later. See LICENSE.
 
   Renders OpenOLMS's text UI into a graphical 80x25 CP437 window using the

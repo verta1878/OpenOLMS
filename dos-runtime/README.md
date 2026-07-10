@@ -29,7 +29,7 @@ CWSDPMI is Copyright (C) 1995-2010 Charles W. Sandmann, licensed under the
 The complete corresponding source is included in `cwsdpmi-src/`.
 
 Source (this copy) is redistributed as part of the OpenOLMS repository:
-  https://github.com/verta1878/OpenOLMS   (dos-runtime/cwsdpmi-src/)
+  https://github.com/verta1878/openolms   (dos-runtime/cwsdpmi-src/)
 Upstream / updates:
   https://www.delorie.com/djgpp/
 

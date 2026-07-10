@@ -2,7 +2,7 @@ unit olms_kbd_sdl;
 {
   OpenOLMS - SDL keyboard backend (IKeyboard via SDL2 events)
   SPDX-License-Identifier: GPL-3.0-or-later
-  Copyright (C) 2026  Antonio Rico - Ecstasy BBS / Reapern66
+  Copyright (C) 2026  Antonio Rico / Ecstasy BBS (github.com/verta1878)
   Distributed under the GNU General Public License v3 or later. See LICENSE.
 
   Reads keystrokes from the SDL2 event queue (via the shared sdl_bind binding
