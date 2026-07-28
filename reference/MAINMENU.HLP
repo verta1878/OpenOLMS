@@ -1,0 +1,94 @@
+
+   WHAT IS AÿMAILÿDOOR
+   ------------------------------------------------------------------------
+
+   What is a mail door? -  A mail door is a program that allows the user to
+   download mail in a compressed form, for use with other programs that are
+   called 'offline' mail readers.  You can select message areas that are of
+   interest to you, and tell the mail reader what types of messages you are
+   interested in downloading.     This allows you to 'weed' out many of the
+   unwanted messages, and since the messages are compressed, and you do not
+   have to read them while logged on, you save yourself much time.
+
+
+
+   HOW DO I GET STARTED
+   ------------------------------------------------------------------------
+
+   First you will need an "offline mail reader".  There are many... however 
+   if you cannot locate one,  your  Sysop  will most likely be able to help 
+   you out.  Then you select your areas to download. Next you download your
+   messages and logoff the system. After replying to the messages with your
+   offline mail reader,  you call back the system, and upload your replies.
+
+
+
+   REMOTE CONTROL
+   ------------------------------------------------------------------------
+
+   There are a few features you can access by writing special messages that
+   will make your life very easy...
+
+   Anytime you write a message to "OLMS", the mail door knows you are going
+   to  perform some sort of special command.  These commands are entered on
+   the subject line of your message like this:
+
+        From: YOUR NAME
+          To: OLMS
+     Subject: COMMAND
+
+   There are 6 special commands...
+
+
+      ADD          Adds the current conference to your selection.
+
+      DROP         Drops the current conference from your selection.
+
+      RESET        Resets the current conferences message pointers.
+                   You can specify RESET by itself to start back at
+                   the first message, or RESET <number>, like RESET 100
+                   to select the last 100 messages in that conference.
+
+      KEYWORD      Adds/removes a keyword to your keywording list.
+                   Specify it like KEYWORD <word>, where <word> would be
+                   the word you wanted to add to your list.  Also, you
+                   can put a negative sign in front of the <word> and it
+                   will remove it from your keyword list.  Like this:
+
+                      KEYWORD GOOD STUFF    or   KEYWORD -GOOD STUFF
+
+      FILTER       Filter works exactly like the KEYWORD examples above
+                   except it adds/removes filters from your filter list.
+
+      TWIT         Again, TWIT is like the above two examples, but works
+                   on your twit list setup.
+
+
+
+
+   NETMAIL
+   ------------------------------------------------------------------------
+
+   For netmail, use @zone:net/node in the subject line (replacing zone, net
+   and node with the actual netmail address) and  as the first line in your
+   message, you can put "Subject:" followed by a real subject if you wish.
+
+      Here's an example:
+
+           From: YOUR NAME
+             To: PETE ROCCA
+        Subject: @1:2401/123
+
+   Now when OLMS inserts this message into the message base,it will use the
+   the address 1:2401/123 to send it to. Also, if you want to put a subject
+   into the message base, just put it on the first line of the message like
+   this:
+
+      Subject: Hi there!
+      Hi Pete, how are you doing today? Etc...
+
+
+   If you have anymore questions about the mail door,  your Sysop will most
+   likely be more than happy to help out.
+
+   Happy mailing!

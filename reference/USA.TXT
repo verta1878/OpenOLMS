@@ -1,0 +1,92 @@
+           IF YOU LIVE IN THE UNITED STATES, OR ARE REGISTERING BY
+              CREDIT CARD THEN PLEASE USE THIS REGISTRATION FORM
+
+      Name: __________________________________________________________     
+
+  BBS Name: __________________________________________________________     
+
+   Address: __________________________________________________________
+
+            __________________________________________________________
+
+  Software: _______________________________  BBS Hours: ______________
+
+  If registering TransX or InterGate then please include your domain
+  name here: _________________________________________________________
+
+  All names above must be EXACTLY as they appear in your configuration
+  setups, including capital letters, spaces and punctuation.
+
+       PLEASE CHECK ALL OF THE FOLLOWING PROGRAMS YOU ARE REGISTERING
+
+   TransX/Shareware  (5 connection version)              [ ] $   25.00 US
+   TransX/Commercial (250 connection version)            [ ]     50.00 US
+   InterGate (UUCP Internet gateway processor)           [ ]     25.00 US
+   OLMS 2000 (Offline mail system)                       [ ]     25.00 US
+
+                                 Total price of packages:    $ _______ US  
+
+    Upgrading from TransX/Shareware to TransX/Commercial [ ] -   25.00 US  
+                                  
+                                             Credit Card [ ] 
+                                                   Check [ ]               
+                                             Money Order [ ]               
+                                  
+                                      Total registration:    $ _______ US  
+
+    Send my code by:      [ ] Fidonet @ ______________________________
+                          [ ] Mail
+                          [ ] Internet @ _____________________________      
+
+   If upgrading from TransX/Shareware or OLMS/Shareware your serial number
+   will be required as proof of registration.  Serial number: ____________
+
+   By completing this registration form, you have agreed to the conditions
+   of the license agreements for each program, and understand that the
+   registration of said programs does not grant you rights of the software
+   nor the copyrights.
+
+    [ ] I am registering by a check or money order made payable to:        
+        "Multiboard Communications"
+
+    [ ] I am registering by credit card.  I have filled in this form
+        completely and correctly. I understand that it takes up to a
+        week after receiving my form, for my registration code to be
+        sent. Credit card orders will be billed in Canadian dollars at
+        US exchange rates.  I am sending this registration form along
+        with the credit card information to signify my acceptance and
+        as an authorization of payment to: "Multiboard Communications".
+
+          The following information will be needed for processing:
+
+            Cardowner: _________________________________________
+                       (EXACTLY AS THE NAME APPEARS ON THE CARD)
+
+             Cardtype: [ ] Visa [ ] MasterCard
+
+           Cardnumber: ______ - ______ - ______ - ______
+
+           Expiration: ______ / ______ (MM/YY)
+   
+   Please forward this registration form along with the full registration
+   fee to the mailing address listed below.  (Credit card orders may be
+   emailed to the above address or send to our FidoNet address)
+
+   Multiboard Communications                  
+   142 Sandy Street                  
+   London, Ontario, Canada, N5Z 5C7
+
+   FidoNet  1:2401/305
+   Email    sales@multiboard.com
+   WWW      http://www.multiboard.com/
+   FTP      ftp://ftp.multiboard.com/
+
+   Other relevant information, suggestions or comments:
+
+   ___________________________________________________________________
+
+   ___________________________________________________________________
+
+   ___________________________________________________________________
+
+   ___________________________________________________________________
