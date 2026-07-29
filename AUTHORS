@@ -3,13 +3,24 @@ OpenOLMS authors and credits.
 Author / maintainer:
   Antonio Rico / Ecstasy BBS  (github.com/verta1878)
 
-Built in Free Pascal from published format specifications:
-  QWK        - Mark "Sparky" Herring
-  QWKE       - community extension spec
-  Blue Wave  - Cutting Edge Computing
-  JAM        - Joaquim Homrighausen, Andrew Adams, Mats Lentz, Mats Wittel
-  Hudson     - QuickBBS / RemoteAccess community format
+Team:
+  sysop/0   — terminal, serial UART, compiler (fpc264irc)
+  wrench    — network architecture, MOLMS client, OpenOLMS library
+  kiddo     — serial IRQ ring buffer, protocol work
+  evga      — display, RIPView, Mystic monitor
 
-UI components reused from Mystic BBS:
-  Mystic BBS - Copyright 1997-2013 By James Coyle (g00r00), GPLv3.
-  https://www.mysticbbs.com/  -  thanks to g00r00 for releasing Mystic as GPL.
+Built in Free Pascal from published format specifications:
+  QWK        — Mark "Sparky" Herring
+  QWKE       — community extension spec
+  Blue Wave  — Cutting Edge Computing
+  JAM        — Joaquim Homrighausen, Andrew Adams, Mats Lentz, Mats Wittel
+  Hudson     — QuickBBS / RemoteAccess community format
+
+Protocol stack by kiddo (Zmodem, Ymodem, Xmodem, Kermit, CRC).
+
+UI code reused from Mystic BBS:
+  Mystic BBS — Copyright 1997-2013 By James Coyle (g00r00), GPLv3.
+
+Original OLMS by Peter Rocca (MCC, 1994-1998).
+Clean-room reimplementation. No original source code used.
+Created with the author's permission.

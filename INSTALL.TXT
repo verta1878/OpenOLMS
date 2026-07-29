@@ -3,38 +3,39 @@
 ==============================================================================
 
 REQUIREMENTS
-  - 386 or better; DOS, DOSBox, or a Win9x DOS box.
-  - CWSDPMI.EXE (included) - the DPMI host the door needs to run.
-  - An archiver on the PATH: PKZIP.EXE / PKUNZIP.EXE (or ARJ / LHA).
+  - Free Pascal Compiler (FPC) 2.6.4 or 3.2.x
+  - For DOS: go32v2 cross-compiler (ppcross386)
+  - For Win32: i386-win32 cross-compiler or native FPC
+  - For MOLMS: Free Vision (FV) units for target platform
 
-STEP 1 - COPY THE FILES
-  Make a directory for the door, e.g.  C:\OLMS  , and copy all of these into it:
-      OLMS.EXE  CONFIG.EXE  CWSDPMI.EXE  CWSDPMI.DOC  OLMS.CFG
-  Make sure PKZIP.EXE / PKUNZIP.EXE are in that directory or on the DOS PATH.
+QUICK BUILD (Linux)
+  cd src
+  fpc olms.pas              # builds the door
+  fpc config.pas            # builds the config editor
+  fpc molms.pas             # builds the MOLMS client (needs FV)
+  fpc olmsmnt.pas           # builds maintenance tool
 
-STEP 2 - CONFIGURE
-  From that directory run:
-      CONFIG.EXE
-  Set:
-    - System Information : System name, Sysop name, Board ID (1-8 chars).
-    - Archiver Programs  : the compress / decompress commands, e.g.
-          Compress:    PKZIP.EXE -ex %ARCHIVE% %FILES%
-          Decompress:  PKUNZIP.EXE -o %ARCHIVE%
-    - Message Areas      : add your JAM / Hudson message areas (number, name,
-                           type, path; Hudson also needs the board number).
-    - Press  S  to save (writes OLMS.CFG).
+QUICK BUILD (DOS cross-compile)
+  ppcross386 -Tgo32v2 olms.pas
+  ppcross386 -Tgo32v2 config.pas
 
-STEP 3 - TEST
-      OLMS.EXE --version      (should print the version)
-      OLMS.EXE /DA            (reads a dropfile, scans areas, builds the .QWK)
+QUICK BUILD (Win32 cross-compile)
+  ppcross386 -Twin32 molms.pas
 
-STEP 4 - HOOK IT INTO YOUR BBS (RemoteAccess type-7 example)
-  Create a door / type-7 menu entry that drops the caller into:
-      C:\OLMS\OLMS.EXE /DA
-  Give the door node access to its directory and a dropfile (DORINFO1.DEF or
-  DOOR.SYS). See docs/RUNNING.md in the source repo for all switches.
+INSTALL AS A BBS DOOR
+  1. Copy OLMS.EXE and CONFIG.EXE to a door directory (e.g. C:\OLMS\)
+  2. Run CONFIG.EXE to set up paths, archivers, areas
+  3. In your BBS menu editor, add:
+       Command: C:\OLMS\OLMS.EXE
+       Parameters: (optional switches, see docs/RUNNING.md)
 
-NOTE
-  CWSDPMI is Copyright Charles W. Sandmann, GPLv2; full source is in the source
-  repository under dos-runtime/cwsdpmi-src/.
+SPELL CHECK (optional)
+  See docs/SPELL_SETUP.md for Hunspell library + dictionary setup.
+
+MOLMS CLIENT
+  1. Copy MOLMS.EXE to any directory
+  2. Run MOLMS.EXE
+  3. Add a BBS to the address book (BBS menu -> Add BBS)
+  4. Use Auto Mail Run (Alt-M) for one-key mail cycle
+
 ==============================================================================
