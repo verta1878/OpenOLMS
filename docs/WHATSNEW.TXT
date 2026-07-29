@@ -21,7 +21,7 @@
   - Session capture logging (mtcapture.pas).
   - GPLv3 license headers on all files with team credits.
   - Copyright: verta1878, sysop/0, wrench, kiddo, evga.
-  - Mystic protocol code: Copyright James Coyle (g00r00), GPLv3.
+  - Protocol code by kiddo (Zmodem, Ymodem, Xmodem, Kermit, CRC).
 
 0.4
   - Readable DOS docs: text files now use DOS (CRLF) line endings so they
