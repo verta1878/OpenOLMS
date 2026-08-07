@@ -80,3 +80,55 @@ All notable changes to OpenOLMS. Format: [Keep a Changelog](https://keepachangel
 - File subsystem, networking, taglines, vacation, logging, multi-language
 - Config tool: all 12 screens, IScreen (console + SDL), IKeyboard
 - Door user UI: main menu, conference selection
+
+## [1.0] - 2026-08-07
+
+### Added — Binary Compatibility
+- OL_Compat.pas: packed record types matching original OLMS v2000
+  - TOLMSConfigRaw: 14,889 bytes raw buffer with 18 accessor functions
+  - TOLMSUser: 478 bytes packed record (SizeOf MATCH)
+  - TOLMSArea: 64 bytes packed record (SizeOf MATCH)
+  - ReadTPStr/WriteTPStr: Turbo Pascal ShortString I/O (exported)
+  - CfgGet/CfgSet accessors for all known config fields
+- editor.pas (EDITOR.EXE): 203 lines, full-screen CRT message editor
+  - Arrow keys, PgUp/PgDn, Home/End, Ctrl-W save, Ctrl-Q quit
+  - Ctrl-K spell check, Ctrl-Y delete line, quote support (/Q:file)
+  - Uses OL_Editor engine + Hunspell
+- userconf.pas (USERCONF.EXE): 348 lines, user self-configuration
+  - Archiver selection (ARJ/LHA/ZIP/ARC/PAK/RAR)
+  - Protocol selection (Xmodem/Ymodem/Zmodem)
+  - Message area toggles (383 areas, Space to toggle)
+  - Reads/writes original USERS.DAT via OL_Compat
+- upgrade1.pas (UPGRADE1.EXE): 192 lines
+  - Upgrades OLMS.CFG + MESSAGES.CTL to v2000 format
+  - Creates MESSAGES.INF + USERS.IDX if missing
+  - Auto-backup of originals before modifying
+- upgrade2.pas (UPGRADE2.EXE): 247 lines
+  - Upgrades USERS.DAT to v2000 (478 bytes/record, 30 slots)
+  - Auto-detects old record size (scan 50..1000)
+  - Creates WORK1/WORK2 directories, checks SCREENS.DAT
+  - Auto-backup of originals before modifying
+- OL_Editor: Lines property, SetLine, DeleteLine, InsertLineAt methods
+- STATUS.md: full v1.0 status with compatibility phases + known issues
+- TODO.TXT: prioritized v1.1 roadmap
+- INSTALL.TXT: new/upgrade installation guide
+- LICENSE: GPLv3 with Peter Rocca credit
+- FILE_ID.DIZ: BBS file description
+
+### Fixed
+- FPC Lo(200) nibble bug: Lo() on Byte constant returns low nibble (8),
+  not low byte (0xC8). Changed to (V and $FF) for version write.
+- ArchiverSel array overflow in userconf: clamp to 0..5, show "Unknown"
+  for out-of-range values from old data files.
+- WStart unused in spell check: now reports column position in output.
+- upgrade2 record size detection: widened scan from 200..500 to 50..1000.
+- OL_Compat nested comment warning: removed directive from comment block.
+- openolms.pas + olmscfg.pas: class(TApplication) → object(TApplication)
+  to fix FreeVision object inheritance in FPC OBJFPC mode.
+
+### Verified
+- Config round-trip: load original OLMS.CFG, save, binary diff = 0
+- All data files created with correct sizes by upgrade tools
+- Version 200 reads back correctly after write
+- All 8 programs compile (5 standalone clean, 2 main door + config, 1 client)
+- Peter Rocca's permission: GPLv3 clean-room reimplementation

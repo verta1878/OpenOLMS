@@ -1,41 +1,36 @@
 # Credits
 
-## OpenOLMS
-Author / maintainer: Antonio Rico / Ecstasy BBS (github.com/verta1878)
+## OpenOLMS v1.0
+Author / maintainer: Antonio Rico / verta1878 (github.com/verta1878)
 
 ## Team
 | Who | What |
 |-----|------|
-| verta1878 | Project lead, architect, door implementation |
-| sysop/0 | Terminal, serial UART, compiler (fpc264irc) |
-| wrench | Network architecture, MOLMS client, OpenOLMS library |
-| kiddo | Serial IRQ ring buffer, protocol work |
-| evga | Display, RIPView, Mystic monitor |
+| verta1878 | Project lead, QWK engine, door implementation, config editor |
+| sysop/0 | Compiler (fpc264irc), FOSSIL socket backend, Wine RTL fix |
+| wrench | Binary compatibility (OL_Compat, L1-L7), editor, userconf, upgrade tools, serial layer, protocol analyzer |
+| kiddo | Serial IRQ ring buffer, protocols (Zmodem Int64 fix, Ymodem, Xmodem, Kermit) |
+| evga | Display, RIPView, SIO2K OS/2 driver (13,371 lines), Mystic monitor |
+| hexadecimal | PCBoard 15.4 (pcbrevival), Linux serial plan, pcbis UI, PCBTIC |
+| g00r00 | Mystic BBS protocol + UI code (GPLv3) |
 
-## Mystic BBS components
+## Original OLMS
+Peter Rocca — OLMS Version 2000 (MCC, 1994-1998).
+Permission granted July 2026 for GPLv3 clean-room reimplementation.
+No original source code used.
+
+## Mystic BBS Components
 OpenOLMS reuses protocol and UI code from Mystic BBS:
 
     Mystic BBS — Copyright 1997-2013 By James Coyle (g00r00)
     Licensed under the GNU General Public License v3 or later.
 
-Files retain James Coyle's original copyright and GPL headers.
-OpenOLMS is also GPLv3, so this reuse is license-compatible.
-Thanks to g00r00 for Mystic BBS and for releasing it under the GPL.
-
-Mystic BBS: https://www.mysticbbs.com/
-
-## Original OLMS
-Peter Rocca, Multiboard Communications Centre, Ontario Canada, 1994-1998.
-OpenOLMS is a clean-room reimplementation from published documentation.
-No original source code was used. Created with the author's permission
-through correspondence with Antonio Rico and Leslie Given.
-
-## Format specifications implemented
-- QWK — Mark "Sparky" Herring
-- QWKE — community extension spec
-- Blue Wave — Cutting Edge Computing (George Hatchew, 1993-1996)
-- JAM — Joaquim Homrighausen, Andrew Adams, Mats Lentz, Mats Wittel (1993)
-- Hudson — QuickBBS / RemoteAccess community format (Adam Hudson, 1987)
-
-## DOS runtime
-CWSDPMI — Copyright Charles W. Sandmann, GPLv2.
+## Format Specifications
+| Format | Author |
+|--------|--------|
+| QWK | Mark "Sparky" Herring |
+| QWKE | Community extension spec |
+| Blue Wave | Cutting Edge Computing |
+| JAM | Joaquim Homrighausen, Andrew Adams, Mats Lentz, Mats Wittel |
+| Hudson | QuickBBS / RemoteAccess community |
+| FOSSIL | FidoNet FSC-0015 (VEP Software, PCMicro) |

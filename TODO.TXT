@@ -1,34 +1,34 @@
 ==============================================================================
- OpenOLMS - TODO / ROADMAP
+ OpenOLMS v1.0 — TODO
 ==============================================================================
 
-PLANNED
-  - Wire MOLMS reply composer to full FV editor (multi-line, cursor movement)
-  - Wire REP packing from MOLMS reply queue into uploadable .REP files
-  - Search messages by keyword/sender/subject in the MOLMS reader
-  - Interactive front-end: menu-driven UI when OLMS door runs for a caller
-    (conference select, read/scan, pack, upload) matching classic OLMS screens
-  - Local mode: run OLMS at the console as the sysop (no dropfile)
-  - Read RemoteAccess CONFIG.RA to auto-fill system/sysop names and areas
-  - File uploaded replies back INTO the message base (currently parsed only)
-  - Wire mterm's ANSI/RIP viewer into the MOLMS message display
+CRITICAL (v1.1):
+  [ ] Wire openolms.pas to OL_Compat packed records
+  [ ] Wire olmscfg.pas to OL_Compat packed records
+  [ ] Fix FreeVision class vs object (BUG 2)
 
-NICE TO HAVE
-  - More archivers preconfigured (ARJ, LHA, ZIP variants)
-  - Reader-compatibility testing against MultiMail / Blue Wave / etc
-  - Internet / QWKnet gateway polish
-  - Phonebook import/export
-  - Threaded message view (tree display by RefNum)
-  - Message tagging and batch operations
-  - Offline file requesting through MOLMS
+IMPORTANT:
+  [ ] Word wrap in editor at column 72 (match original)
+  [ ] Load area tags from MESSAGES.CTL in userconf area selection
+  [ ] Test with original OLMS data (Peter Rocca's files)
 
-KNOWN LIMITATIONS
-  - The graphical SDL config UI is for modern OSes (Windows/Linux/macOS) only;
-    real DOS uses the text (CRT) config UI
-  - MOLMS client requires FV (Free Vision) for the TUI; DOS door uses pure ANSI
-  - Spell check requires Hunspell library + dictionary; silently disabled if
-    not present (see docs/SPELL_SETUP.md)
-  - Tested primarily via Linux build plus DOS smoke tests
+NICE TO HAVE:
+  [ ] Create default SCREENS.DAT in upgrade tools
+  [ ] DOS cross-compile (go32v2) for all 7 programs
+  [ ] Compare against Peter Rocca's source when received
 
-Have a request or a bug? Open an issue at github.com/verta1878/OpenOLMS
+DONE (v1.0):
+  [x] Binary-compatible packed records (OL_Compat.pas)
+  [x] Config round-trip (load, save, 0 diffs)
+  [x] EDITOR.EXE standalone message editor
+  [x] USERCONF.EXE user self-configuration
+  [x] UPGRADE1.EXE config + area upgrade
+  [x] UPGRADE2.EXE user database upgrade
+  [x] Integration test PASS
+  [x] Documentation (INSTALL.TXT, WHATSNEW, LICENSE)
+  [x] Fix ArchiverSel bounds check
+  [x] Fix FPC Lo() nibble bug
+  [x] Fix upgrade2 record scan range
+  [x] Fix OL_Compat nested comment
+  [x] Fix WStart unused in spell check
 ==============================================================================

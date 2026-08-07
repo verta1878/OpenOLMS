@@ -1,26 +1,34 @@
-OpenOLMS authors and credits.
+OpenOLMS — Authors and Credits
 
 Author / maintainer:
-  Antonio Rico / Ecstasy BBS  (github.com/verta1878)
+  Antonio Rico / verta1878  (github.com/verta1878)
 
 Team:
-  sysop/0   — terminal, serial UART, compiler (fpc264irc)
-  wrench    — network architecture, MOLMS client, OpenOLMS library
-  kiddo     — serial IRQ ring buffer, protocol work
-  evga      — display, RIPView, Mystic monitor
+  sysop/0      — compiler (fpc264irc), FOSSIL socket backend (m_fossil_socket),
+                  fpc264irc Wine deadlock fix (InitSystemThreads), PPU rebuild
+  wrench       — binary compatibility (OL_Compat.pas, L1-L7), message editor,
+                  user configuration, upgrade tools, serial layer (serial_ext.pas),
+                  protocol analyzer (NM_DebugView), engine architecture
+  kiddo        — serial IRQ ring buffer, protocol stack (Zmodem Int64 fix,
+                  Ymodem batch, Xmodem 1K/CRC, Kermit sliding window)
+  evga         — display, RIPView, SIO2K OS/2 driver rebuild (13,371 lines),
+                  Mystic BBS monitor
+  hexadecimal  — PCBoard 15.4 (pcbrevival), Linux serial plan (ASYNC mapping),
+                  pcbis installer UI, PCBTIC, BinkleyTerm XE mailer plan
+  g00r00       — Mystic BBS protocol code (Copyright 1997-2013 James Coyle, GPLv3)
 
-Built in Free Pascal from published format specifications:
+Original OLMS:
+  Peter Rocca  — OLMS Version 2000 (MCC, 1994-1998)
+                  Permission granted July 2026, GPLv3.
+                  Clean-room reimplementation — no original source code used.
+                  All record layouts reverse-engineered from published data files.
+
+Built from published format specifications:
   QWK        — Mark "Sparky" Herring
   QWKE       — community extension spec
   Blue Wave  — Cutting Edge Computing
   JAM        — Joaquim Homrighausen, Andrew Adams, Mats Lentz, Mats Wittel
   Hudson     — QuickBBS / RemoteAccess community format
 
-Protocol stack by kiddo (Zmodem, Ymodem, Xmodem, Kermit, CRC).
-
-UI code reused from Mystic BBS:
-  Mystic BBS — Copyright 1997-2013 By James Coyle (g00r00), GPLv3.
-
-Original OLMS by Peter Rocca (MCC, 1994-1998).
-Clean-room reimplementation. No original source code used.
-Created with the author's permission.
+Binary compatibility verified against OLMS Version 2000 data files:
+  OLMS.CFG (14,889 bytes), USERS.DAT (30 × 478), MESSAGES.CTL (383 × 64)

@@ -33,7 +33,7 @@ const
   cmTestConfig  = 1008;
 
 type
-  TOLMSCfgApp = class(TApplication)
+  TOLMSCfgApp = object(TApplication)
     Cfg: TOLMSConfig;
     CfgFile: String;
     Modified: Boolean;

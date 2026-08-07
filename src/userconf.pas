@@ -106,6 +106,7 @@ procedure ShowArchiverMenu;
 var I, Sel: Integer; K: Char;
 begin
   Sel := Users[UserIdx].ArchiverSel[0];
+  if Sel > 5 then Sel := 0;
   repeat
     ClrScr; DrawHeader;
     GotoXY(3, 3); TextColor(Yellow);
@@ -260,7 +261,10 @@ begin
 
     GotoXY(5, 5);
     if Sel = 0 then TextColor(White) else TextColor(LightGray);
-    WriteLn('A  Default Archiver    : ', ARCHIVER_NAMES[Users[UserIdx].ArchiverSel[0]]);
+    if Users[UserIdx].ArchiverSel[0] <= 5 then
+      WriteLn('A  Default Archiver    : ', ARCHIVER_NAMES[Users[UserIdx].ArchiverSel[0]])
+    else
+      WriteLn('A  Default Archiver    : Unknown (', Users[UserIdx].ArchiverSel[0], ')');
 
     GotoXY(5, 6);
     if Sel = 1 then TextColor(White) else TextColor(LightGray);

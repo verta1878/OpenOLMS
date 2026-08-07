@@ -16,7 +16,7 @@
     USERS.IDX          4 bytes
 
   Turbo Pascal String[N] = N+1 bytes (1 length byte + N char bytes).
-  Use {$PACKRECORDS 1} to prevent FPC from adding alignment padding.
+  Use PACKRECORDS 1 directive to prevent FPC from adding alignment padding.
   =========================================================================== }
 
 {$MODE OBJFPC}{$H-}

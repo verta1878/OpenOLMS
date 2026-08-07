@@ -46,7 +46,7 @@ const
   cmAbout      = 1007;
 
 type
-  TOpenOLMS = class(TApplication)
+  TOpenOLMS = object(TApplication)
     Config: TOLMSConfig;
     constructor Init;
     procedure InitMenuBar; virtual;

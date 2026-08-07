@@ -94,7 +94,7 @@ begin
 
   { Try to detect old record size by finding common divisors }
   OldRecSize := 0;
-  for I := 200 to 500 do
+  for I := 50 to 1000 do
     if FileSize mod I = 0 then
     begin
       OldCount := FileSize div I;

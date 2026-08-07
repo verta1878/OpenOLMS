@@ -211,7 +211,7 @@ begin
         Sug := FSpell.Suggest(Word);
         { Could store errors for UI display }
         if Sug <> '' then
-          WriteLn('Line ', I + 1, ': "', Word, '" -> ', Sug)
+          WriteLn('Line ', I + 1, ' Col ', WStart, ': "', Word, '" -> ', Sug)
         else
           WriteLn('Line ', I + 1, ': "', Word, '"');
       end;
