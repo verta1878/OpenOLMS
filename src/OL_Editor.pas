@@ -59,6 +59,12 @@ type
     function  CheckWord(const W: String): Boolean;
     function  SuggestWord(const W: String): String;
     function  SpellAvailable: Boolean;
+
+    procedure SetLine(N: Integer; const S: String);
+    procedure DeleteLine(N: Integer);
+    procedure InsertLineAt(N: Integer; const S: String);
+
+    property  Lines: TStringList read FLines;
   end;
 
 implementation
@@ -226,6 +232,30 @@ end;
 function TOLEditor.SpellAvailable: Boolean;
 begin
   Result := FSpell.Loaded;
+end;
+
+procedure TOLEditor.SetLine(N: Integer; const S: String);
+begin
+  if (N >= 0) and (N < FLines.Count) then begin
+    FLines[N] := S;
+    FModified := True;
+  end;
+end;
+
+procedure TOLEditor.DeleteLine(N: Integer);
+begin
+  if (N >= 0) and (N < FLines.Count) and (FLines.Count > 1) then begin
+    FLines.Delete(N);
+    FModified := True;
+  end;
+end;
+
+procedure TOLEditor.InsertLineAt(N: Integer; const S: String);
+begin
+  if (N >= 0) and (N <= FLines.Count) and (FLines.Count < OL_MAX_LINES) then begin
+    FLines.Insert(N, S);
+    FModified := True;
+  end;
 end;
 
 end.

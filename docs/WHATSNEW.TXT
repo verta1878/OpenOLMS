@@ -21,7 +21,7 @@
   - Session capture logging (mtcapture.pas).
   - GPLv3 license headers on all files with team credits.
   - Copyright: verta1878, sysop/0, wrench, kiddo, evga.
-  - Protocol code by kiddo (Zmodem, Ymodem, Xmodem, Kermit, CRC).
+  - Mystic protocol code: Copyright James Coyle (g00r00), GPLv3.
 
 0.4
   - Readable DOS docs: text files now use DOS (CRLF) line endings so they
@@ -49,4 +49,34 @@
 0.1
   - First release: QWK / QWKE / Blue Wave offline-mail door for DOS.
     Free Pascal (go32v2), GPLv3.
+==============================================================================
+
+1.0 — Binary Compatibility Release
+  - DROP-IN REPLACEMENT for Peter Rocca's OLMS Version 2000.
+  - All 7 programs: OLMS, CONFIG, EDITOR, MAINTAIN, USERCONF,
+    UPGRADE1, UPGRADE2 — compile and produce correct output.
+  - Binary-compatible packed record types (OL_Compat.pas):
+      OLMS.CFG:      14,889 bytes — SizeOf MATCH
+      USERS.DAT:     30 × 478 bytes — SizeOf MATCH
+      MESSAGES.CTL:  383 × 64 bytes — SizeOf MATCH
+  - ReadTPStr/WriteTPStr: Turbo Pascal ShortString I/O for
+    reading/writing original data files byte-for-byte.
+  - Config round-trip verified: load original, save, 0 diffs.
+  - EDITOR.EXE: full-screen CRT console message editor with
+    spell check, arrow keys, PgUp/PgDn, Ctrl-W save, Ctrl-Q quit.
+  - USERCONF.EXE: archiver/protocol selection, message area
+    toggles (383 areas), reads/writes original USERS.DAT.
+  - UPGRADE1.EXE: upgrades OLMS.CFG + MESSAGES.CTL to v2000,
+    creates index files, backs up originals.
+  - UPGRADE2.EXE: upgrades USERS.DAT to v2000 record layout,
+    auto-detects old record size, creates work directories.
+  - Fixed FPC Lo(200) nibble bug: Lo() on Byte constant returns
+    low nibble (4 bits), not low byte. Use (V and $FF) instead.
+  - OL_Editor: added Lines property, SetLine, DeleteLine,
+    InsertLineAt methods for FPC {$MODE OBJFPC} compatibility.
+  - Integration test: all data files created with correct sizes,
+    version 200 reads back correctly, all fields verified.
+  - Peter Rocca's permission: GPLv3. Clean-room reimplementation.
+  - No original source code used. All record layouts reverse-
+    engineered from published data files and documentation.
 ==============================================================================

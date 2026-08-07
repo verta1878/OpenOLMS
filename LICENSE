@@ -1,18 +1,33 @@
                     GNU GENERAL PUBLIC LICENSE
                        Version 3, 29 June 2007
 
- Copyright (C) 2007 Free Software Foundation, Inc. <https://fsf.org/>
- Everyone is permitted to copy and distribute verbatim copies
- of this license document, but changing it is not allowed.
+ Copyright (C) 2026 Antonio Rico (verta1878) and contributors.
 
-                            Preamble
+ This program is free software: you can redistribute it and/or modify
+ it under the terms of the GNU General Public License as published by
+ the Free Software Foundation, either version 3 of the License, or
+ (at your option) any later version.
 
-  The GNU General Public License is a free, copyleft license for
-software and other kinds of works.
+ This program is distributed in the hope that it will be useful,
+ but WITHOUT ANY WARRANTY; without even the implied warranty of
+ MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ GNU General Public License for more details.
 
-  [Full GPLv3 text at https://www.gnu.org/licenses/gpl-3.0.txt]
+ You should have received a copy of the GNU General Public License
+ along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
-OpenOLMS — Copyright (C) 2026 verta1878, sysop/0, wrench, kiddo, evga.
-Protocol code by kiddo. Mystic BBS UI — Copyright (C) 1997-2013 James Coyle (g00r00), GPLv3.
-Clean-room reimplementation of OLMS by Peter Rocca (MCC, 1994-1998).
-No original OLMS source code used.
+ ORIGINAL OLMS
+ Peter Rocca's OLMS (Offline Mail System, Version 2000) was the
+ inspiration for this project. Peter granted permission to create
+ this clean-room reimplementation under GPLv3. No original source
+ code was used. All record layouts were reverse-engineered from
+ published data files and documentation.
+
+ CREDITS
+ verta1878    — project lead, QWK engine, config editor
+ sysop/0      — compiler (fpc264irc), FOSSIL socket backend
+ wrench       — binary compatibility, editor, upgrade tools, serial
+ kiddo        — protocols (Zmodem Int64 fix), serial IRQ
+ evga         — display, RIPView, SIO2K OS/2 driver
+ g00r00       — Mystic BBS protocol code (GPLv3)
+ Peter Rocca  — original OLMS (permission granted)
