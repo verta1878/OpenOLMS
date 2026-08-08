@@ -22,7 +22,7 @@ uses
   OL_Hudson, OL_QWK, OL_Packer, OL_Filter;
 
 const
-  VERSION = 'OpenOLMS 0.1 — Open Offline Mail System';
+  VERSION = 'OpenOLMS 1.0 — Open Offline Mail System';
 
 var
   Cfg: TOLMSConfig;

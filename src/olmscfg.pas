@@ -1,6 +1,6 @@
 { ===========================================================================
   OpenOLMS — Open Offline Mail System
-  GPLv3 — Copyright (C) 2026 FPC264IRC Contributors.
+  GPLv3 — Copyright (C) 2026 verta1878, sysop/0, wrench, kiddo, evga.
   Clean-room reimplementation. No original source code used.
   =========================================================================== }
 

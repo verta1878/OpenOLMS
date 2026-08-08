@@ -1,5 +1,5 @@
 { ===========================================================================
-  OL_Editor — Offline mail reply editor with spell check
+  OpenOLMS — OL_Editor — Offline mail reply editor with spell check
   Copyright (C) 2025-2026 IRC Fork: verta1878, sysop/0, evga, kiddo, wrench
   GPLv3
 

@@ -34,7 +34,7 @@ uses
   OL_Config, OL_QWK;
 
 const
-  VERSION = 'OpenOLMS 0.1 — Open Offline Mail System';
+  VERSION = 'OpenOLMS 1.0 — Open Offline Mail System';
 
   { Menu commands }
   cmScanMail   = 1001;
