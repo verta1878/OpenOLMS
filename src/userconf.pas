@@ -34,6 +34,8 @@ const
 
 var
   Users: array[0..OLMS_MAX_USERS-1] of TOLMSUser;
+  Areas: array[0..OLMS_MAX_AREAS-1] of TOLMSArea;
+  AreaCount: Integer;
   UserCount: Integer;
   UserIdx: Integer;
   FileName: String;
@@ -61,6 +63,24 @@ begin
   UserCount := FileSize(F) div OLMS_USER_SIZE;
   if UserCount > OLMS_MAX_USERS then UserCount := OLMS_MAX_USERS;
   BlockRead(F, Users, UserCount * OLMS_USER_SIZE);
+  CloseFile(F);
+end;
+
+procedure LoadAreas;
+var
+  F: File;
+  CtlFile: String;
+begin
+  AreaCount := 0;
+  FillChar(Areas, SizeOf(Areas), 0);
+  { Try MESSAGES.CTL in same directory as USERS.DAT }
+  CtlFile := ExtractFilePath(FileName) + 'MESSAGES.CTL';
+  if not FileExists(CtlFile) then Exit;
+  AssignFile(F, CtlFile);
+  Reset(F, 1);
+  AreaCount := FileSize(F) div OLMS_AREA_SIZE;
+  if AreaCount > OLMS_MAX_AREAS then AreaCount := OLMS_MAX_AREAS;
+  BlockRead(F, Areas, AreaCount * OLMS_AREA_SIZE);
   CloseFile(F);
 end;
 
@@ -207,7 +227,10 @@ begin
         Write('[X] ')
       else
         Write('[ ] ');
-      Write('Area ', Row:3);
+      if (Row < AreaCount) and (Areas[Row].AreaTag <> '') then
+        Write(Row:3, ' ', Areas[Row].AreaTag)
+      else
+        Write(Row:3, ' (empty)');
     end;
     DrawStatus;
 
@@ -334,6 +357,7 @@ begin
 
   FileName := ParamStr(1);
   LoadUsers;
+  LoadAreas;
 
   { Find user by name or number }
   UserIdx := StrToIntDef(ParamStr(2), -1);

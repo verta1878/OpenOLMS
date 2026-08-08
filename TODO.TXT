@@ -1,34 +1,20 @@
 ==============================================================================
- OpenOLMS v1.0 — TODO
+ OpenOLMS v1.0 — RELEASED
 ==============================================================================
 
-CRITICAL (v1.1):
-  [ ] Wire openolms.pas to OL_Compat packed records
-  [ ] Wire olmscfg.pas to OL_Compat packed records
-  [ ] Fix FreeVision class vs object (BUG 2)
+ALL v1.0 PHASES COMPLETE:
+  [x] L1-L8:   Binary compatibility + documentation
+  [x] L9-L10:  openolms + olmscfg wired to OL_Compat
+  [x] L11:     Editor word wrap at column 72
+  [x] L12:     Area names in userconf from MESSAGES.CTL
+  [x] L13:     Final integration test PASS
+  [x] L14:     GitHub repo cleanup
+  [x] All 5 bugs fixed
+  [x] All 8 programs compile clean
 
-IMPORTANT:
-  [ ] Word wrap in editor at column 72 (match original)
-  [ ] Load area tags from MESSAGES.CTL in userconf area selection
-  [ ] Test with original OLMS data (Peter Rocca's files)
-
-NICE TO HAVE:
+FUTURE (v1.1):
   [ ] Create default SCREENS.DAT in upgrade tools
-  [ ] DOS cross-compile (go32v2) for all 7 programs
+  [ ] DOS cross-compile (go32v2) for all 8 programs
   [ ] Compare against Peter Rocca's source when received
-
-DONE (v1.0):
-  [x] Binary-compatible packed records (OL_Compat.pas)
-  [x] Config round-trip (load, save, 0 diffs)
-  [x] EDITOR.EXE standalone message editor
-  [x] USERCONF.EXE user self-configuration
-  [x] UPGRADE1.EXE config + area upgrade
-  [x] UPGRADE2.EXE user database upgrade
-  [x] Integration test PASS
-  [x] Documentation (INSTALL.TXT, WHATSNEW, LICENSE)
-  [x] Fix ArchiverSel bounds check
-  [x] Fix FPC Lo() nibble bug
-  [x] Fix upgrade2 record scan range
-  [x] Fix OL_Compat nested comment
-  [x] Fix WStart unused in spell check
+  [ ] Test with real BBS (RemoteAccess 2.x) as door
 ==============================================================================

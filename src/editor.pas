@@ -87,7 +87,7 @@ begin
 end;
 
 procedure HandleKey(K: TKeyEvent);
-var C: Char; Code: Word; Line: String;
+var C: Char; Code: Word; Line, Wrapped: String; WrapPos: Integer;
 begin
   Code := GetKeyEventCode(K);
   C := GetKeyEventChar(K);
@@ -132,7 +132,25 @@ begin
         Line := Ed.GetLine(Ed.CurLine);
         if Ed.CurCol > Length(Line) then Line := Line + C
         else Insert(C, Line, Ed.CurCol);
-        Ed.SetLine(Ed.CurLine, Line); Ed.CurCol := Ed.CurCol + 1;
+        Ed.CurCol := Ed.CurCol + 1;
+
+        { Word wrap at column 72 — match original EDITOR.EXE }
+        if Length(Line) >= 72 then begin
+          WrapPos := 72;
+          while (WrapPos > 1) and (Line[WrapPos] <> ' ') do
+            WrapPos := WrapPos - 1;
+          if WrapPos > 1 then begin
+            { Split at last space before column 72 }
+            Wrapped := Copy(Line, WrapPos + 1, Length(Line));
+            Line := Copy(Line, 1, WrapPos - 1);
+            Ed.SetLine(Ed.CurLine, Line);
+            Ed.InsertLineAt(Ed.CurLine + 1, Wrapped);
+            Ed.CurLine := Ed.CurLine + 1;
+            Ed.CurCol := Length(Wrapped) + 1;
+          end else
+            Ed.SetLine(Ed.CurLine, Line);
+        end else
+          Ed.SetLine(Ed.CurLine, Line);
       end;
     end;
   end

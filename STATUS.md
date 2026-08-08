@@ -111,9 +111,9 @@ Reads/writes original USERS.DAT via OL_Compat packed records.
 
 | # | Priority | Description |
 |---|----------|-------------|
-| 1 | critical | openolms + olmscfg not wired to OL_Compat packed records |
-| 2 | important | Editor has no word wrap (original wrapped at column 72) |
-| 3 | nice | Userconf shows "Area 0" not area tag from MESSAGES.CTL |
+| ~~1~~ | ~~critical~~ | ~~L9+L10: wired to OL_Compat~~ ✅ |
+| ~~2~~ | ~~important~~ | ~~L11: Word wrap at column 72~~ ✅ |
+| ~~3~~ | ~~important~~ | ~~L12: Area names from MESSAGES.CTL~~ ✅ |
 | 4 | nice | Default SCREENS.DAT not created by upgrade tools |
 
 ## Credits
