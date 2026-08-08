@@ -15,15 +15,18 @@ A QWK/QWKE/BlueWave compatible offline mail system for BBS. Two sides:
 mail offline with ANSI/RIP rendering, composes replies with spell check,
 uploads .REP.
 
-## Programs
+## Programs (8)
 
-| Binary | Target | Size | What |
-|--------|--------|------|------|
-| openolms_dos.exe | DOS go32v2 | 336K | BBS door — pure ANSI menus |
-| molms.exe | Win32 FV | 442K | Offline mail client — connect, read, reply |
-| olmsmnt.exe | DOS go32v2 | 129K | CLI maintenance |
-| olmscfg | Win32 FV | — | Configuration editor |
-| openolms | Win32 FV | — | FV TUI door version |
+| Binary | Source | Lines | What |
+|--------|--------|-------|------|
+| OLMS.EXE | openolms.pas | 436 | Main BBS door — QWK/QWKE/BlueWave offline mail |
+| CONFIG.EXE | olmscfg.pas | 307 | Configuration editor (12 screens, FV TUI) |
+| EDITOR.EXE | editor.pas | 661 | Standalone message editor (CRT, word wrap col 72) |
+| MAINTAIN.EXE | olmsmnt.pas | 1135 | Database maintenance/packing |
+| USERCONF.EXE | userconf.pas | 376 | User self-configuration (archiver, protocol, areas) |
+| UPGRADE1.EXE | upgrade1.pas | 245 | Config + message area upgrade to v2000 |
+| UPGRADE2.EXE | upgrade2.pas | 247 | User database upgrade to v2000 |
+| MOLMS.EXE | molms.pas | 2602 | Win32 offline mail client (bonus — connect, read, reply) |
 
 ## MOLMS — The Offline Mail Client
 
@@ -140,15 +143,19 @@ openolms /RG=50       reset back 50 messages
 | mt_spell.pas | 179 | Hunspell dynamic loader (Win/Linux/macOS) |
 | OL_Editor.pas | 231 | Reply editor with spell check integration |
 
-### Programs (5)
+### Programs (8)
 
 | File | Lines | What |
 |------|-------|------|
-| openolms_dos.pas | 353 | Pure DOS door (ANSI menus) |
-| molms.pas | 742 | MOLMS offline mail client (FV TUI) |
-| olmscfg.pas | 306 | Configuration editor (FV TUI) |
-| olmsmnt.pas | 131 | Maintenance CLI |
-| openolms.pas | 175 | FV TUI door version |
+| openolms.pas | 436 | Main BBS door (FV TUI) |
+| openolms_dos.pas | 353 | DOS door wrapper (ANSI menus) |
+| olmscfg.pas | 307 | Configuration editor (FV TUI) |
+| editor.pas | 661 | Standalone message editor (CRT) |
+| olmsmnt.pas | 1135 | Database maintenance |
+| userconf.pas | 376 | User self-configuration |
+| upgrade1.pas | 245 | Config + area upgrade |
+| upgrade2.pas | 247 | User database upgrade |
+| molms.pas | 2602 | Win32 offline mail client |
 
 ### DOS Door Support (1 unit)
 
