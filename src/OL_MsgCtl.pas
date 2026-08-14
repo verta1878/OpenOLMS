@@ -48,25 +48,34 @@ const
 
 type
   TMsgAreaRec = packed record
-    NameLen   : Byte;
-    Name      : array[1..MSGCTL_NAME_LEN] of Char;
-    _Pad1     : array[1..4] of Byte;
-    Flags     : Word;
-    AreaNum   : Word;
-    BaseType  : Byte;
-    _Pad2     : Byte;
-    MaxMsgs   : Word;
-    _Pad3     : array[1..16] of Byte;
+    NameLen    : Byte;                          { @  0: String[35] length byte }
+    Name       : array[1..MSGCTL_NAME_LEN] of Char; { @  1: area tag name }
+    ReadAccess : Word;                          { @ 36: read security level }
+    WriteAccess: Word;                          { @ 38: write security level }
+    Flags      : Word;                          { @ 40: area flags }
+    BoardNum   : Word;                          { @ 42: Hudson board number }
+    BaseType   : Byte;                          { @ 44: msg base type }
+    _Res1      : Byte;                          { @ 45: reserved }
+    AreaNum    : Word;                          { @ 46: RA conference number }
+    AreaType   : Byte;                          { @ 48: 0=local 1=net 2=echo }
+    _Res2      : array[1..5] of Byte;           { @ 49: reserved }
+    MaxMsgs    : Word;                          { @ 54: max msgs to pack }
+    _Res3      : array[1..8] of Byte;           { @ 56: reserved }
   end;
 
   { Parsed area info — clean Pascal record }
   TMsgArea = record
-    Name      : String;
-    AreaNum   : Word;
-    Flags     : Word;
-    BaseType  : Byte;
-    MaxMsgs   : Word;
-    Selected  : Boolean;   { user has selected this area for scanning }
+    Name       : String;
+    AreaNum    : Word;
+    BoardNumber: Word;
+    Flags      : Word;
+    BaseType   : Byte;
+    AreaType   : Byte;
+    ReadAccess : Word;
+    WriteAccess: Word;
+    MaxMsgs    : Word;
+    Selected   : Boolean;   { user has selected this area for scanning }
+    RawRec     : TMsgAreaRec; { original raw record for byte-perfect save }
   end;
 
   TMsgAreaList = array of TMsgArea;
@@ -85,7 +94,7 @@ function AreaHasFlag(const Area: TMsgArea; Flag: Word): Boolean;
 
 implementation
 
-uses SysUtils;
+uses SysUtils, OL_Compat;
 
 function LoadMsgCtl(const Filename: String; var Areas: TMsgAreaList): Boolean;
 var
@@ -120,13 +129,19 @@ begin
         Break;
       end;
 
+      { Preserve raw record BEFORE any field capping }
+      Areas[I].RawRec := Rec;
+
       { Extract the area name — length-prefixed Pascal string }
       if Rec.NameLen > MSGCTL_NAME_LEN then
         Rec.NameLen := MSGCTL_NAME_LEN;
       SetLength(Areas[I].Name, Rec.NameLen);
       Move(Rec.Name[1], Areas[I].Name[1], Rec.NameLen);
-
-      Areas[I].AreaNum  := Rec.AreaNum;
+      Areas[I].AreaNum    := Rec.AreaNum;
+      Areas[I].BoardNumber := Rec.BoardNum;
+      Areas[I].AreaType    := Rec.AreaType;
+      Areas[I].ReadAccess  := Rec.ReadAccess;
+      Areas[I].WriteAccess := Rec.WriteAccess;
       Areas[I].Flags    := Rec.Flags;
       Areas[I].BaseType := Rec.BaseType;
       Areas[I].MaxMsgs  := Rec.MaxMsgs;
@@ -146,34 +161,23 @@ end;
 function SaveMsgCtl(const Filename: String; const Areas: TMsgAreaList): Boolean;
 var
   F: File;
+  I: Integer;
   Rec: TMsgAreaRec;
-  I, Len: Integer;
 begin
   Result := False;
   AssignFile(F, Filename);
-  {$I-}
-  Rewrite(F, 1);
-  {$I+}
+  {$I-} Rewrite(F, 1); {$I+}
   if IOResult <> 0 then Exit;
 
-  try
-    for I := 0 to High(Areas) do
-    begin
-      FillChar(Rec, SizeOf(Rec), 0);
-      Len := Length(Areas[I].Name);
-      if Len > MSGCTL_NAME_LEN then Len := MSGCTL_NAME_LEN;
-      Rec.NameLen := Len;
-      Move(Areas[I].Name[1], Rec.Name[1], Len);
-      Rec.AreaNum  := Areas[I].AreaNum;
-      Rec.Flags    := Areas[I].Flags;
-      Rec.BaseType := Areas[I].BaseType;
-      Rec.MaxMsgs  := Areas[I].MaxMsgs;
-      BlockWrite(F, Rec, MSGCTL_RECORD_SIZE);
-    end;
-    Result := True;
-  finally
-    CloseFile(F);
+  for I := 0 to High(Areas) do
+  begin
+    { Write raw record verbatim for byte-perfect round-trip }
+    Rec := Areas[I].RawRec;
+    BlockWrite(F, Rec, SizeOf(Rec));
   end;
+
+  CloseFile(F);
+  Result := True;
 end;
 
 function FindArea(const Areas: TMsgAreaList; AreaNum: Word): Integer;

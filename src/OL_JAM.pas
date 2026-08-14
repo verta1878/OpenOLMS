@@ -1,28 +1,32 @@
 { ===========================================================================
-  OpenOLMS — Open Offline Mail System
-  GPLv3 — Copyright (C) 2026 verta1878, sysop/0, wrench, kiddo, evga.
-  Clean-room reimplementation. No original source code used.
+  OpenOLMS -- Open Offline Mail System
+  GPLv3 -- Copyright (C) 2026 verta1878, sysop/0, wrench, kiddo, evga.
+  Clean-room re{ Write a new message to JAM message base }
+
+
+
+implementation. No original source code used.
   =========================================================================== }
 
 unit OL_JAM;
 { ===========================================================================
-  OpenOLMS — JAM message base reader
+  OpenOLMS -- JAM message base reader
   ---------------------------------------------------------------------------
   JAM (Joaquim-Andrew-Mats) message base format, 1993. Used by many
   FidoNet-capable BBS packages. Four files per area:
 
-    .JHR  — fixed-size header records (TJAMHeader)
-    .JDT  — message body text (variable-length, offset from header)
-    .JDX  — index records (CRC32 of recipient + offset into .JHR)
-    .JLR  — last-read pointers per user
+    .JHR  -- fixed-size header records (TJAMHeader)
+    .JDT  -- message body text (variable-length, offset from header)
+    .JDX  -- index records (CRC32 of recipient + offset into .JHR)
+    .JLR  -- last-read pointers per user
 
   Each header is 76 bytes. The body is stored at a byte offset in
   .JDT with a length from the header. Subfields follow the header
-  in .JHR — variable-length tagged data (from, to, subject, msgid,
+  in .JHR -- variable-length tagged data (from, to, subject, msgid,
   reply, origin, etc).
 
   Reference: JAM specification by Joaquim Homrighausen,
-  Andrew Milner, Mats Birch, Mats Wallin — 1993.
+  Andrew Milner, Mats Birch, Mats Wallin -- 1993.
   =========================================================================== }
 
 {$MODE OBJFPC}{$H+}
@@ -60,31 +64,31 @@ const
   JAMSFLD_FTSKLUDGE   = 2000;
 
 type
-  { JAM fixed header — 76 bytes }
+  { JAM fixed header -- 76 bytes }
   TJAMHeader = packed record
-    Signature   : array[0..3] of Char;   {  4 — 'JAM\0' }
-    Revision    : Word;                   {  2 — spec revision }
+    Signature   : array[0..3] of Char;   {  4 -- 'JAM\0' }
+    Revision    : Word;                   {  2 -- spec revision }
     ReservedWord: Word;                   {  2 }
-    SubfieldLen : LongInt;                {  4 — total bytes of subfields }
+    SubfieldLen : LongInt;                {  4 -- total bytes of subfields }
     TimesRead   : LongInt;                {  4 }
-    MSGIDcrc    : LongInt;                {  4 — CRC-32 of MSGID }
-    REPLYcrc    : LongInt;                {  4 — CRC-32 of REPLY }
-    ReplyTo     : LongInt;                {  4 — msg number of parent }
-    Reply1st    : LongInt;                {  4 — first reply }
-    ReplyNext   : LongInt;                {  4 — next reply in chain }
-    DateWritten : LongInt;                {  4 — Unix timestamp }
+    MSGIDcrc    : LongInt;                {  4 -- CRC-32 of MSGID }
+    REPLYcrc    : LongInt;                {  4 -- CRC-32 of REPLY }
+    ReplyTo     : LongInt;                {  4 -- msg number of parent }
+    Reply1st    : LongInt;                {  4 -- first reply }
+    ReplyNext   : LongInt;                {  4 -- next reply in chain }
+    DateWritten : LongInt;                {  4 -- Unix timestamp }
     DateReceived: LongInt;                {  4 }
     DateProcessed: LongInt;               {  4 }
     MsgNum      : LongInt;                {  4 }
-    Attr        : LongInt;                {  4 — attribute bits }
+    Attr        : LongInt;                {  4 -- attribute bits }
     Attr2       : LongInt;                {  4 }
-    TxtOffset   : LongInt;                {  4 — offset into .JDT }
-    TxtLen      : LongInt;                {  4 — length in .JDT }
+    TxtOffset   : LongInt;                {  4 -- offset into .JDT }
+    TxtLen      : LongInt;                {  4 -- length in .JDT }
     PasswordCRC : LongInt;                {  4 }
     Cost        : LongInt;                {  4 }
   end;                                    { = 76 bytes }
 
-  { JAM subfield header — variable length }
+  { JAM subfield header -- variable length }
   TJAMSubfield = packed record
     LoID    : Word;       { subfield type }
     HiID    : Word;       { unused (0) }
@@ -140,6 +144,11 @@ procedure JAMSetLastRead(const BaseName: String;
 
 { CRC-32 of a lowercase string (used for user matching in JAM) }
 function JAMCRC32(const S: String): LongInt;
+function JAMWriteMessage(const BaseName: String;
+  const MsgTo, MsgFrom, Subject, Body: String;
+  Attr: LongInt): Boolean;
+
+
 
 implementation
 
@@ -309,7 +318,7 @@ begin
       BlockRead(FHdr, Hdr, JAM_HDR_SIZE, BytesRead);
       if BytesRead <> JAM_HDR_SIZE then Break;
 
-      { Skip subfields — we read them fully in JAMReadMessage }
+      { Skip subfields -- we read them fully in JAMReadMessage }
       if Hdr.SubfieldLen > 0 then
         Seek(FHdr, FilePos(FHdr) + Hdr.SubfieldLen);
 
@@ -319,7 +328,7 @@ begin
       if Count > High(Messages) then Break;
       if (MaxMsgs > 0) and (Count >= MaxMsgs) then Break;
 
-      { Lightweight record — body is read lazily during packing }
+      { Lightweight record -- body is read lazily during packing }
       Messages[Count].MsgNum    := Hdr.MsgNum;
       Messages[Count].IsPrivate := (Hdr.Attr and JAM_PRIVATE) <> 0;
       Messages[Count].IsDeleted := False;
@@ -421,6 +430,176 @@ begin
   finally
     CloseFile(F);
   end;
+end;
+
+function JAMWriteMessage(const BaseName: String;
+  const MsgTo, MsgFrom, Subject, Body: String;
+  Attr: LongInt): Boolean;
+var
+  FHdr, FTxt, FIdx: File;
+  UnixNow: LongInt;
+  InfoHdr: array[0..1023] of Byte;
+  ActiveBuf: array[0..3] of Byte;
+  JHR: array[0..75] of Byte;   { JAM header fixed part = 76 bytes }
+  SubField: array[0..511] of Byte;
+  SubLen: Integer;
+  TxtOfs, TxtLen: LongInt;
+  MsgNum: LongInt;
+  HdrOfs: LongInt;
+  IdxRec: array[0..7] of Byte;  { JAM index = 8 bytes }
+  JCRC: LongInt;
+begin
+  Result := False;
+
+  { Write message text to .JDT }
+  AssignFile(FTxt, BaseName + '.JDT');
+  {$I-} Reset(FTxt, 1); {$I+}
+  if IOResult <> 0 then Rewrite(FTxt, 1);
+  Seek(FTxt, FileSize(FTxt));
+  TxtOfs := FilePos(FTxt);
+  TxtLen := Length(Body);
+  BlockWrite(FTxt, Body[1], TxtLen);
+  CloseFile(FTxt);
+
+  { Build subfields: SENDERNAME(0), RECEIVERNAME(1), SUBJECT(2) }
+  SubLen := 0;
+
+  { Subfield header: LoID(2) + HiID(2) + DatLen(4) + Data }
+  { SENDERNAME = LoID 0, HiID 0 }
+  SubField[SubLen] := 0; SubField[SubLen+1] := 0;  { LoID = 0 }
+  SubField[SubLen+2] := 0; SubField[SubLen+3] := 0; { HiID = 0 }
+  SubField[SubLen+4] := Length(MsgFrom) and $FF;
+  SubField[SubLen+5] := (Length(MsgFrom) shr 8) and $FF;
+  SubField[SubLen+6] := 0; SubField[SubLen+7] := 0;
+  Move(MsgFrom[1], SubField[SubLen+8], Length(MsgFrom));
+  Inc(SubLen, 8 + Length(MsgFrom));
+
+  { RECEIVERNAME = LoID 1 }
+  SubField[SubLen] := 1; SubField[SubLen+1] := 0;
+  SubField[SubLen+2] := 0; SubField[SubLen+3] := 0;
+  SubField[SubLen+4] := Length(MsgTo) and $FF;
+  SubField[SubLen+5] := (Length(MsgTo) shr 8) and $FF;
+  SubField[SubLen+6] := 0; SubField[SubLen+7] := 0;
+  Move(MsgTo[1], SubField[SubLen+8], Length(MsgTo));
+  Inc(SubLen, 8 + Length(MsgTo));
+
+  { SUBJECT = LoID 2 }
+  SubField[SubLen] := 2; SubField[SubLen+1] := 0;
+  SubField[SubLen+2] := 0; SubField[SubLen+3] := 0;
+  SubField[SubLen+4] := Length(Subject) and $FF;
+  SubField[SubLen+5] := (Length(Subject) shr 8) and $FF;
+  SubField[SubLen+6] := 0; SubField[SubLen+7] := 0;
+  Move(Subject[1], SubField[SubLen+8], Length(Subject));
+  Inc(SubLen, 8 + Length(Subject));
+
+  { Build JAM header fixed part (76 bytes)
+    Offset  Size  Field
+    0       4     Signature "JAM "
+    4       2     Revision (1)
+    6       2     ReservedWord
+    8       4     SubfieldLen
+    12      4     TimesRead
+    16      4     MSGIDcrc
+    20      4     REPLYcrc
+    24      4     ReplyTo
+    28      4     Reply1st
+    32      4     ReplyNext
+    36      4     DateWritten (Unix timestamp)
+    40      4     DateReceived
+    44      4     DateProcessed
+    48      4     MessageNumber
+    52      4     Attribute
+    56      4     Attribute2
+    60      4     TxtOffset
+    64      4     TxtLen
+    68      4     PasswordCRC
+    72      4     Cost }
+
+  FillChar(JHR, SizeOf(JHR), 0);
+  JHR[0] := Ord('J'); JHR[1] := Ord('A'); JHR[2] := Ord('M'); JHR[3] := 0;
+  JHR[4] := 1; JHR[5] := 0;  { Revision 1 }
+
+  { SubfieldLen }
+  JHR[8] := SubLen and $FF;
+  JHR[9] := (SubLen shr 8) and $FF;
+
+  { DateWritten = current Unix timestamp }
+  { UnixNow declared at top }
+  UnixNow := Round((Now - EncodeDate(1970, 1, 1)) * 86400);
+  JHR[36] := UnixNow and $FF;
+  JHR[37] := (UnixNow shr 8) and $FF;
+  JHR[38] := (UnixNow shr 16) and $FF;
+  JHR[39] := (UnixNow shr 24) and $FF;
+
+  { Attribute }
+  JHR[52] := Attr and $FF;
+  JHR[53] := (Attr shr 8) and $FF;
+
+  { TxtOffset }
+  JHR[60] := TxtOfs and $FF;
+  JHR[61] := (TxtOfs shr 8) and $FF;
+  JHR[62] := (TxtOfs shr 16) and $FF;
+  JHR[63] := (TxtOfs shr 24) and $FF;
+
+  { TxtLen }
+  JHR[64] := TxtLen and $FF;
+  JHR[65] := (TxtLen shr 8) and $FF;
+
+  { Write header + subfields to .JHR }
+  AssignFile(FHdr, BaseName + '.JHR');
+  {$I-} Reset(FHdr, 1); {$I+}
+  if IOResult <> 0 then Rewrite(FHdr, 1);
+
+  { Skip fixed header info (1024 bytes) if file is new }
+  if FileSize(FHdr) < 1024 then
+  begin
+    { InfoHdr declared at top }
+    FillChar(InfoHdr, 1024, 0);
+    InfoHdr[0] := Ord('J'); InfoHdr[1] := Ord('A');
+    InfoHdr[2] := Ord('M'); InfoHdr[3] := 0;
+    BlockWrite(FHdr, InfoHdr, 1024);
+  end;
+
+  Seek(FHdr, FileSize(FHdr));
+  HdrOfs := FilePos(FHdr);
+  BlockWrite(FHdr, JHR, 76);
+  BlockWrite(FHdr, SubField, SubLen);
+
+  { Read MsgNum from header info block (offset 12 = ActiveMsgs) }
+  Seek(FHdr, 12);
+  { ActiveBuf declared at top }
+  BlockRead(FHdr, ActiveBuf, 4);
+  MsgNum := ActiveBuf[0] or (ActiveBuf[1] shl 8) or
+            (ActiveBuf[2] shl 16) or (ActiveBuf[3] shl 24);
+  Inc(MsgNum);
+  ActiveBuf[0] := MsgNum and $FF;
+  ActiveBuf[1] := (MsgNum shr 8) and $FF;
+  ActiveBuf[2] := (MsgNum shr 16) and $FF;
+  ActiveBuf[3] := (MsgNum shr 24) and $FF;
+  Seek(FHdr, 12);
+  BlockWrite(FHdr, ActiveBuf, 4);
+  CloseFile(FHdr);
+
+  { Write index to .JDX }
+  AssignFile(FIdx, BaseName + '.JDX');
+  {$I-} Reset(FIdx, 1); {$I+}
+  if IOResult <> 0 then Rewrite(FIdx, 1);
+  Seek(FIdx, FileSize(FIdx));
+
+  { Index entry: UserCRC(4) + HdrOffset(4) }
+  JCRC := JAMCRC32(LowerCase(MsgTo));
+  IdxRec[0] := JCRC and $FF;
+  IdxRec[1] := (JCRC shr 8) and $FF;
+  IdxRec[2] := (JCRC shr 16) and $FF;
+  IdxRec[3] := (JCRC shr 24) and $FF;
+  IdxRec[4] := HdrOfs and $FF;
+  IdxRec[5] := (HdrOfs shr 8) and $FF;
+  IdxRec[6] := (HdrOfs shr 16) and $FF;
+  IdxRec[7] := (HdrOfs shr 24) and $FF;
+  BlockWrite(FIdx, IdxRec, 8);
+  CloseFile(FIdx);
+
+  Result := True;
 end;
 
 end.

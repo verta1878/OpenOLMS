@@ -28,6 +28,18 @@ uploads .REP.
 | UPGRADE2.EXE | upgrade2.pas | 247 | User database upgrade to v2000 |
 | MOLMS.EXE | molms.pas | 2602 | Win32 offline mail client (bonus — connect, read, reply) |
 
+## mterm RIP Engine (kiddo)
+
+RIPscrip v1.54 graphics engine for BBS terminals. 640×350 EGA canvas
+with BGI-compatible rendering. All 6 development phases complete.
+
+| File | Lines | What |
+|------|-------|------|
+| mtrip.pas | 632 | RIPscrip command dispatcher (49 commands) |
+| mtripgfx.pas | 840 | Pixel rendering engine (Bresenham, FloodFill, Bezier) |
+| mtrip_test.pas | 55 | Smoke test harness |
+| rip_font8x8.inc | — | 8x8 bitmap font data |
+
 ## MOLMS — The Offline Mail Client
 
 Not a door — the user's program. Complete offline mail workflow:

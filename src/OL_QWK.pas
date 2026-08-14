@@ -146,63 +146,85 @@ procedure QWKWriteControl(var F: Text; const Ctrl: TQWKControl);
 { Write an NDX entry }
 procedure QWKWriteNdx(var F: File; BlockOffset: LongInt; ConfNum: Byte);
 
+
+
 implementation
 
 uses SysUtils;
 
+function QWKParseHeader(const Buf: array of Byte): TQWKHeader;
+begin
+  FillChar(Result, SizeOf(Result), 0);
+  if Length(Buf) < QWK_BLOCK_SIZE then Exit;
+
+  Result.Status := Chr(Buf[0]);
+  Move(Buf[1], Result.MsgNum, 7);
+  Move(Buf[8], Result.DateTime, 13);
+  Move(Buf[21], Result.MsgTo, 25);
+  Move(Buf[46], Result.MsgFrom, 25);
+  Move(Buf[71], Result.Subject, 25);
+  Move(Buf[96], Result.Password, 12);
+  Move(Buf[108], Result.RefNum, 8);
+  Move(Buf[116], Result.NumBlocks, 6);
+  Result.Alive := Chr(Buf[122]);
+  Result.ConfNum := Buf[123] or (Buf[124] shl 8);
+  Result._Unused := Buf[125] or (Buf[126] shl 8);
+  Result.NetTag := Chr(Buf[127]);
+end;
+
 function QWKFieldToStr(const Field; Size: Integer): String;
 var
   P: PChar;
-  I: Integer;
+  I, Last: Integer;
 begin
-  SetLength(Result, Size);
   P := @Field;
-  for I := 1 to Size do
-    Result[I] := P[I - 1];
-  Result := TrimRight(Result);
+  Last := 0;
+  for I := 0 to Size - 1 do
+    if P[I] <> ' ' then Last := I + 1;
+  SetString(Result, P, Last);
+  Result := Trim(Result);
 end;
 
 function QWKBlockCount(const H: TQWKHeader): Integer;
+var S: String;
 begin
-  Result := StrToIntDef(Trim(QWKFieldToStr(H.NumBlocks, 6)), 1);
+  SetString(S, @H.NumBlocks[1], 6);
+  Result := StrToIntDef(Trim(S), 1);
+  if Result < 1 then Result := 1;
 end;
 
 function QWKMsgNumber(const H: TQWKHeader): LongInt;
+var S: String;
 begin
-  Result := StrToIntDef(Trim(QWKFieldToStr(H.MsgNum, 7)), 0);
+  SetString(S, @H.MsgNum[1], 7);
+  Result := StrToIntDef(Trim(S), 0);
 end;
 
 function QWKRefNumber(const H: TQWKHeader): LongInt;
+var S: String;
 begin
-  Result := StrToIntDef(Trim(QWKFieldToStr(H.RefNum, 8)), 0);
-end;
-
-function QWKParseHeader(const Buf: array of Byte): TQWKHeader;
-begin
-  { HAZARD: Buf must be at least 128 bytes. The caller is responsible
-    for reading the right amount from MESSAGES.DAT. }
-  Move(Buf[0], Result, SizeOf(TQWKHeader));
+  SetString(S, @H.RefNum[1], 8);
+  Result := StrToIntDef(Trim(S), 0);
 end;
 
 function QWKReadBody(var F: File; BlockOffset, BlockCount: Integer): String;
 var
   Buf: array[0..QWK_BLOCK_SIZE - 1] of Byte;
-  I, J, BodyBlocks: Integer;
+  I, J, BytesRead: Integer;
   Ch: Char;
 begin
   Result := '';
-  BodyBlocks := BlockCount - 1;   { first block is the header }
-  if BodyBlocks <= 0 then Exit;
-
-  Seek(F, (BlockOffset) * QWK_BLOCK_SIZE);  { skip header block }
-  for I := 0 to BodyBlocks - 1 do
+  Seek(F, LongInt(BlockOffset) * QWK_BLOCK_SIZE);
+  for I := 0 to BlockCount - 1 do
   begin
-    BlockRead(F, Buf, QWK_BLOCK_SIZE);
+    FillChar(Buf, QWK_BLOCK_SIZE, 0);
+    {$I-} BlockRead(F, Buf, QWK_BLOCK_SIZE, BytesRead); {$I+}
+    if BytesRead <> QWK_BLOCK_SIZE then Break;
     for J := 0 to QWK_BLOCK_SIZE - 1 do
     begin
-      Ch := Char(Buf[J]);
+      Ch := Chr(Buf[J]);
       if Ch = QWK_NEWLINE then
-        Result := Result + LineEnding
+        Result := Result + #13#10
       else if Ch <> #0 then
         Result := Result + Ch;
     end;
@@ -211,20 +233,35 @@ end;
 
 procedure QWKWriteHeader(const H: TQWKHeader; var Buf: array of Byte);
 begin
+  if Length(Buf) < QWK_BLOCK_SIZE then Exit;
   FillChar(Buf[0], QWK_BLOCK_SIZE, ' ');
-  Move(H, Buf[0], SizeOf(TQWKHeader));
+  Buf[0] := Ord(H.Status);
+  Move(H.MsgNum, Buf[1], 7);
+  Move(H.DateTime, Buf[8], 13);
+  Move(H.MsgTo, Buf[21], 25);
+  Move(H.MsgFrom, Buf[46], 25);
+  Move(H.Subject, Buf[71], 25);
+  Move(H.Password, Buf[96], 12);
+  Move(H.RefNum, Buf[108], 8);
+  Move(H.NumBlocks, Buf[116], 6);
+  Buf[122] := Ord(H.Alive);
+  Buf[123] := H.ConfNum and $FF;
+  Buf[124] := (H.ConfNum shr 8) and $FF;
+  Buf[125] := H._Unused and $FF;
+  Buf[126] := (H._Unused shr 8) and $FF;
+  Buf[127] := Ord(H.NetTag);
 end;
 
 procedure QWKStrToField(const S: String; var Field; Size: Integer);
 var
   P: PChar;
-  I, Len: Integer;
+  I, CopyLen: Integer;
 begin
   P := @Field;
   FillChar(P^, Size, ' ');
-  Len := Length(S);
-  if Len > Size then Len := Size;
-  for I := 1 to Len do
+  CopyLen := Length(S);
+  if CopyLen > Size then CopyLen := Size;
+  for I := 1 to CopyLen do
     P[I - 1] := S[I];
 end;
 
@@ -239,22 +276,76 @@ begin
   WriteLn(F, Ctrl.PackDate);
   WriteLn(F, Ctrl.PackTime);
   WriteLn(F, Ctrl.UserName);
-  WriteLn(F);    { line 9: unused }
-  WriteLn(F);    { line 10: unused }
+  WriteLn(F, '');       { unused line 9 }
+  WriteLn(F, '0');      { unused line 10 }
   WriteLn(F, Ctrl.NumConfs);
   for I := 0 to High(Ctrl.Conferences) do
   begin
     WriteLn(F, Ctrl.Conferences[I].Number);
     WriteLn(F, Ctrl.Conferences[I].Name);
   end;
+  WriteLn(F, 'HELLO');
+  WriteLn(F, 'NEWS');
+  WriteLn(F, 'GOODBYE');
 end;
 
 procedure QWKWriteNdx(var F: File; BlockOffset: LongInt; ConfNum: Byte);
-var Entry: TQWKNdxEntry;
+var
+  NdxRec: packed record
+    Offset: Single;   { IEEE single float — block offset }
+    Conf: Byte;       { conference number }
+  end;
 begin
-  Entry.BlockOffset := Single(BlockOffset);
-  Entry.ConfNum := ConfNum;
-  BlockWrite(F, Entry, SizeOf(Entry));
+  { QWK NDX uses Turbo Pascal Single (4-byte IEEE 754 float)
+    to store the block offset. FPC Single is compatible. }
+  NdxRec.Offset := BlockOffset;
+  NdxRec.Conf := ConfNum;
+  BlockWrite(F, NdxRec, 5);
+end;
+
+
+
+type
+  TQWKEAreaInfo = record
+    AreaNum  : Integer;
+    AreaTag  : String;
+    GroupID  : String;
+  end;
+
+procedure QWKEWriteControl(var F: Text; const Ctrl: TQWKControl;
+  const Areas: array of TQWKEAreaInfo; AreaCount: Integer);
+var I: Integer;
+begin
+  QWKWriteControl(F, Ctrl);
+  WriteLn(F, 'TOREADER');
+  for I := 0 to AreaCount - 1 do
+  begin
+    WriteLn(F, 'AREA ', Areas[I].AreaNum, ':', Areas[I].AreaTag);
+    if Areas[I].GroupID <> '' then
+      WriteLn(F, 'GRPID ', Areas[I].AreaNum, ':', Areas[I].GroupID);
+  end;
+end;
+
+function QWKEParseKludge(const Line: String; var Key, Value: String): Boolean;
+var P: Integer;
+begin
+  Result := False;
+  if (Length(Line) < 2) or (Line[1] <> '@') then Exit;
+  P := Pos(':', Line);
+  if P < 3 then Exit;
+  Key := Copy(Line, 2, P - 2);
+  Value := Copy(Line, P + 2, Length(Line));
+  Result := True;
+end;
+
+function QWKIsNetArea(const AreaTag: String): Boolean;
+begin
+  Result := (Length(AreaTag) > 0) and (AreaTag[1] = '@');
+end;
+
+procedure QWKAddViaKludge(var Body: String; const NodeAddr: String);
+begin
+  Body := Body + '@VIA: ' + NodeAddr + ' ' + FormatDateTime('yyyymmdd.hhnnss', Now) + #13;
 end;
 
 end.

@@ -1,6 +1,15 @@
 { ===========================================================================
   OpenOLMS — Open Offline Mail System
-  Clean-room reimplementation from published Hudson/QuickBBS specification.
+  Clean-room re{ Write a new message to Hudson message base }
+function HudsonWriteMessage(const BasePath: String; Board: Word;
+  const MsgTo, MsgFrom, Subject, Body: String;
+  const PostDate, PostTime: String): Boolean;
+
+function HudsonWriteMessage(const BasePath: String; Board: Word;
+  const MsgTo, MsgFrom, Subject, Body: String;
+  const PostDate, PostTime: String): Boolean;
+
+implementation from published Hudson/QuickBBS specification.
   GPLv3 — Copyright (C) 2026 verta1878, sysop/0, wrench, kiddo, evga.
   Clean-room reimplementation. No original source code used.
   =========================================================================== }
@@ -126,6 +135,10 @@ function HudsonReadInfo(const BasePath: String;
 
 { Extract trimmed string from a fixed-width field }
 function HudsonFieldStr(const Field; Size: Integer): String;
+
+function HudsonWriteMessage(const BasePath: String; Board: Word;
+  const MsgTo, MsgFrom, Subject, Body: String;
+  const PostDate, PostTime: String): Boolean;
 
 implementation
 
@@ -324,6 +337,150 @@ begin
     CloseFile(F);
   end;
   Result := Count;
+end;
+
+function HudsonWriteMessage(const BasePath: String; Board: Word;
+  const MsgTo, MsgFrom, Subject, Body: String;
+  const PostDate, PostTime: String): Boolean;
+var
+  FHdr, FTxt, FIdx: File;
+  HdrBuf: array[0..117] of Byte;
+  IdxBuf: array[0..3] of Byte;
+  TxtRec: array[0..255] of Byte;
+  InfoBuf: array[0..19] of Byte;
+  FInfo: File;
+  MsgNum, TotalMsgs: Word;
+  TxtOfs: LongInt;
+  P, Chunk: Integer;
+begin
+  Result := False;
+  FillChar(HdrBuf, SizeOf(HdrBuf), 0);
+
+  { Read current message count from MSGINFO.BBS }
+  AssignFile(FInfo, BasePath + 'MSGINFO.BBS');
+  {$I-} Reset(FInfo, 1); {$I+}
+  if IOResult <> 0 then
+  begin
+    { Create new MSGINFO.BBS }
+    Rewrite(FInfo, 1);
+    FillChar(InfoBuf, SizeOf(InfoBuf), 0);
+    BlockWrite(FInfo, InfoBuf, SizeOf(InfoBuf));
+    CloseFile(FInfo);
+    Reset(FInfo, 1);
+  end;
+  BlockRead(FInfo, InfoBuf, SizeOf(InfoBuf));
+  TotalMsgs := InfoBuf[2] or (InfoBuf[3] shl 8);
+  MsgNum := TotalMsgs + 1;
+
+  { Build header record (118 bytes)
+    Offset  Size  Field
+    0       2     MsgNum (Word)
+    2       2     PrevMsg (Word)
+    4       2     NextMsg (Word)
+    6       2     TimesRead (Word)
+    8       2     StartRec (Word) — text record start
+    10      2     NumRecs (Word) — text record count
+    12      2     DestNet (Word)
+    14      2     DestNode (Word)
+    16      2     OrigNet (Word)
+    18      2     OrigNode (Word)
+    20      1     DestZone (Byte)
+    21      1     OrigZone (Byte)
+    22      2     Cost (Word)
+    24      2     Attr (Word) — message attributes
+    26      2     Board (Word)
+    28      2     ReplyTo (Word)
+    30      2     SeeAlso (Word)
+    32      6     PostDate — "MM-DD-YY"
+    38      5     PostTime — "HH:MM"
+    43      36    MsgTo — space-padded
+    79      36    MsgFrom — space-padded
+    115     3     Subject prefix (space-padded)
+    ... total 118 bytes }
+
+  { MsgNum }
+  HdrBuf[0] := MsgNum and $FF;
+  HdrBuf[1] := (MsgNum shr 8) and $FF;
+
+  { Board }
+  HdrBuf[26] := Board and $FF;
+  HdrBuf[27] := (Board shr 8) and $FF;
+
+  { PostDate — space-pad to 6 bytes at offset 32 }
+  FillChar(HdrBuf[32], 6, Ord(' '));
+  for P := 1 to Length(PostDate) do
+    if P <= 6 then HdrBuf[31 + P] := Ord(PostDate[P]);
+
+  { PostTime — space-pad to 5 bytes at offset 38 }
+  FillChar(HdrBuf[38], 5, Ord(' '));
+  for P := 1 to Length(PostTime) do
+    if P <= 5 then HdrBuf[37 + P] := Ord(PostTime[P]);
+
+  { MsgTo — space-pad to 36 bytes at offset 43 }
+  FillChar(HdrBuf[43], 36, Ord(' '));
+  for P := 1 to Length(MsgTo) do
+    if P <= 36 then HdrBuf[42 + P] := Ord(MsgTo[P]);
+
+  { MsgFrom — space-pad to 36 bytes at offset 79 }
+  FillChar(HdrBuf[79], 36, Ord(' '));
+  for P := 1 to Length(MsgFrom) do
+    if P <= 36 then HdrBuf[78 + P] := Ord(MsgFrom[P]);
+
+  { Write text to MSGTXT.BBS — get current offset first }
+  AssignFile(FTxt, BasePath + 'MSGTXT.BBS');
+  {$I-} Reset(FTxt, 1); {$I+}
+  if IOResult <> 0 then Rewrite(FTxt, 1);
+  Seek(FTxt, FileSize(FTxt));
+  TxtOfs := FilePos(FTxt);
+
+  { Text records: length byte + up to 255 chars }
+  P := 1;
+  HdrBuf[8] := (TxtOfs div 256) and $FF;
+  HdrBuf[9] := ((TxtOfs div 256) shr 8) and $FF;
+  while P <= Length(Body) do
+  begin
+    Chunk := Length(Body) - P + 1;
+    if Chunk > 255 then Chunk := 255;
+    TxtRec[0] := Chunk;
+    Move(Body[P], TxtRec[1], Chunk);
+    BlockWrite(FTxt, TxtRec, Chunk + 1);
+    Inc(P, Chunk);
+  end;
+  { Num text records }
+  HdrBuf[10] := ((Length(Body) + 254) div 255) and $FF;
+  HdrBuf[11] := (((Length(Body) + 254) div 255) shr 8) and $FF;
+
+  CloseFile(FTxt);
+
+  { Append header to MSGHDR.BBS }
+  AssignFile(FHdr, BasePath + 'MSGHDR.BBS');
+  {$I-} Reset(FHdr, 1); {$I+}
+  if IOResult <> 0 then Rewrite(FHdr, 1);
+  Seek(FHdr, FileSize(FHdr));
+  BlockWrite(FHdr, HdrBuf, 118);
+  CloseFile(FHdr);
+
+  { Append index to MSGIDX.BBS }
+  AssignFile(FIdx, BasePath + 'MSGIDX.BBS');
+  {$I-} Reset(FIdx, 1); {$I+}
+  if IOResult <> 0 then Rewrite(FIdx, 1);
+  Seek(FIdx, FileSize(FIdx));
+  IdxBuf[0] := MsgNum and $FF;
+  IdxBuf[1] := (MsgNum shr 8) and $FF;
+  IdxBuf[2] := Board and $FF;
+  IdxBuf[3] := (Board shr 8) and $FF;
+  BlockWrite(FIdx, IdxBuf, 4);
+  CloseFile(FIdx);
+
+  { Update MSGINFO.BBS — increment total }
+  Inc(TotalMsgs);
+  InfoBuf[2] := TotalMsgs and $FF;
+  InfoBuf[3] := (TotalMsgs shr 8) and $FF;
+  Seek(FInfo, 0);
+  BlockWrite(FInfo, InfoBuf, SizeOf(InfoBuf));
+  CloseFile(FInfo);
+
+  Result := True;
 end;
 
 end.

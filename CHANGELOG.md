@@ -132,3 +132,43 @@ All notable changes to OpenOLMS (Open Offline Mail System). Format: [Keep a Chan
 - File subsystem, networking, taglines, vacation, logging, multi-language
 - Config tool: all 12 screens, IScreen (console + SDL), IKeyboard
 - Door user UI: main menu, conference selection
+
+## [1.0.1] - 2026-08-08
+
+### Updated — mterm RIP Engine (kiddo)
+- mtrip.pas: 267 → 632 lines — full RIPscrip v1.54 command dispatcher
+- mtripgfx.pas: 409 → 840 lines — complete BGI-compatible rendering engine
+- Added mtrip_test.pas (55 lines) — smoke test harness
+- Added rip_font8x8.inc — 8x8 bitmap font data
+
+### New RIP Engine Features
+- 49 RIPscrip commands dispatched (was ~20 with stubs, now 0 stubs)
+- Bresenham line drawing (all angles, all octants)
+- FloodFill with viewport clipping
+- Bezier curve rendering
+- CHR vector fonts (BGI-compatible, sizes 1-10)
+- 8x8 bitmap font rendering via rip_font8x8.inc
+- Mouse fields with hit test and click-to-send host commands
+- ButtonStyle rendering (|1B set style + |1U draw button)
+- Fill patterns: empty, solid, line, slash, backslash, cross, hatched
+- Line styles: solid, dotted, center, dashed
+- Viewport clipping on all drawing operations
+- 640x350 EGA canvas with 16-color palette
+
+### RIP Engine Phases (all complete)
+- MT-1: Core rendering (Bresenham, FloodFill, Bezier, patterns)
+- MT-2: Font system (CHR fonts, 8x8 bitmap, TextWidth/Height)
+- MT-3: Extended commands (19 stubs → full implementations)
+- MT-4: Protocol (| separator, |! comment, |# no-more, 49 dispatch)
+- MT-5: Terminal features (mouse fields, hit test, click-to-send)
+- MT-6: Debug & fix (compile clean, smoke test, gap closure)
+
+### Smoke Test Results
+| Test | Diff | Status |
+|------|------|--------|
+| F_FILL1 | 0.0% | pixel-perfect |
+| F_FILL2 | 0.6% | good |
+| DRAGON01 | 2.5% | good |
+| ICONS | 1.9% | matches ripviewer |
+| v_VIEW | 8.5% | FloodFill viewport fix |
+| S_FILL | 7.9% | bar fill patterns |

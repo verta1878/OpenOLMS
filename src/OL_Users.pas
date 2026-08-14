@@ -1,142 +1,153 @@
 { ===========================================================================
-  OpenOLMS — Open Offline Mail System
-  Clean-room reimplementation from published documentation.
-  GPLv3 — Copyright (C) 2026 verta1878, sysop/0, wrench, kiddo, evga.
+  OL_Users — User database management
+  GPLv3 — Copyright (C) 2026 FPC264IRC Contributors.
   Clean-room reimplementation. No original source code used.
   =========================================================================== }
 
 unit OL_Users;
-{ ===========================================================================
-  OpenOLMS — USERS.DAT format
-  ---------------------------------------------------------------------------
-  USERS.DAT stores per-user offline mail settings: last message read
-  pointers, selected areas, archive preference, and session history.
-
-  Binary format (from original distribution binary dump):
-
-    Each record is approximately 256 bytes (packed):
-      Offset 0:     Record length / flags (Word + Word)
-      Offset 4:     User name (length-prefixed, up to 36 chars)
-      Offset 48:    Last pack date (8 bytes, MM-DD-YY format)
-      Offset 56:    Last pack time (5 bytes, HH:MM format)
-      Offset 64:    Password/registration hash (8 bytes)
-      Offset 72:    User flags (Byte)
-      Offset 80:    Archive preference (Byte: 0=ZIP,1=ARJ,2=LHA...)
-      Offset 81:    Protocol preference (Byte)
-      Offset 82:    Packet format (Byte: 0=QWK,1=BlueWave)
-      Offset 83:    Conference selection bitmap (variable length)
-
-  The exact layout varies with the number of configured conferences.
-  We handle this by reading the header fixed portion and then the
-  variable-length conference bitmap.
-
-  This record layout was reconstructed from the USERS.DAT binary in
-  the original distribution, showing "Leslie Given" as a user with
-  conference selections and last-pack timestamps.
-  =========================================================================== }
 
 {$MODE OBJFPC}{$H+}
+{$PACKRECORDS 1}
 
 interface
 
-const
-  OLMS_USER_NAME_LEN = 36;
-  OLMS_MAX_CONFS     = 200;   { max conferences OLMS supports }
+uses
+  SysUtils, OL_Compat;
 
 type
-  TOLMSUser = record
-    Name          : String;
-    LastPackDate  : String;    { MM-DD-YY }
-    LastPackTime  : String;    { HH:MM }
-    ArchivePref   : Byte;     { 0=ZIP, 1=ARJ, 2=LHA, 3=ARC, 4=PAK, 5=RAR }
-    ProtocolPref  : Byte;     { 0=Xmodem, 1=Ymodem, 2=Zmodem }
-    PacketFormat  : Byte;     { 0=QWK, 1=BlueWave }
-    ConfSelected  : array[0..OLMS_MAX_CONFS - 1] of Boolean;
-    MsgPointers   : array[0..OLMS_MAX_CONFS - 1] of LongInt;
-    TotalPacks    : LongInt;
-    TotalMsgs     : LongInt;
+  TSessionInfo = record
+    UserName      : String;
+    RealName      : String;
+    SecurityLevel : Integer;
+    TimeRemaining : Integer;
+    ComPort       : Integer;
+    BaudRate      : LongInt;
+    NodeNumber    : Integer;
+    ANSI          : Boolean;
+    RIP           : Boolean;
   end;
 
-  TOLMSUserList = array of TOLMSUser;
+procedure DefaultSession(var S: TSessionInfo);
+procedure NewUser(var U: TOLMSUser; const Name: String);
+function  LoadUser(const Filename: String; const Name: String;
+  var U: TOLMSUser): Boolean;
+procedure SaveUser(const Filename: String; const Name: String;
+  const U: TOLMSUser);
 
-{ Find a user by name in USERS.DAT (case-insensitive) }
-function FindUser(const Users: TOLMSUserList; const Name: String): Integer;
-
-{ Create a new user with defaults }
-procedure NewUser(var User: TOLMSUser; const Name: String);
-
-{ Reset message pointers for a user }
-procedure ResetPointers(var User: TOLMSUser; ResetBack: LongInt);
-
-{ Reset selected area pointers only }
-procedure ResetSelectedPointers(var User: TOLMSUser;
-  const Areas: array of Boolean; ResetBack: LongInt);
+{ Credit control }
+function  UserGetCredits(const U: TOLMSUser): Integer;
+function  UserHasCredits(const U: TOLMSUser; Cost: Integer): Boolean;
+procedure UserDeductCredit(var U: TOLMSUser; Cost: Integer);
+procedure UserAddCredits(var U: TOLMSUser; Amount: Integer);
 
 implementation
 
-uses SysUtils;
-
-function FindUser(const Users: TOLMSUserList; const Name: String): Integer;
-var I: Integer;
+procedure DefaultSession(var S: TSessionInfo);
 begin
-  for I := 0 to High(Users) do
-    if CompareText(Users[I].Name, Name) = 0 then
-    begin
-      Result := I;
-      Exit;
-    end;
-  Result := -1;
+  FillChar(S, SizeOf(S), 0);
+  S.UserName := 'LOCAL';
+  S.RealName := 'Local User';
+  S.SecurityLevel := 255;
+  S.TimeRemaining := 60;
+  S.ComPort := 0;
+  S.ANSI := True;
 end;
 
-procedure NewUser(var User: TOLMSUser; const Name: String);
-var I: Integer;
+procedure NewUser(var U: TOLMSUser; const Name: String);
 begin
-  FillChar(User, SizeOf(User), 0);
-  User.Name := Name;
-  User.ArchivePref := 0;    { ZIP default }
-  User.ProtocolPref := 2;   { Zmodem default }
-  User.PacketFormat := 0;   { QWK default }
-  { Select all conferences by default }
-  for I := 0 to OLMS_MAX_CONFS - 1 do
-    User.ConfSelected[I] := True;
+  FillChar(U, SizeOf(U), 0);
+  U.Status := 1;
+  WriteTPStr(U.UserName, 30, Name);
+  WriteTPStr(U.LastDate, 8, FormatDateTime('mm-dd-yy', Now));
+  WriteTPStr(U.LastTime, 8, FormatDateTime('hh:nn', Now));
 end;
 
-procedure ResetPointers(var User: TOLMSUser; ResetBack: LongInt);
-var I: Integer;
+function LoadUser(const Filename: String; const Name: String;
+  var U: TOLMSUser): Boolean;
+var
+  F: File;
+  Rec: TOLMSUser;
+  BytesRead: Integer;
 begin
-  { /RG — reset all pointers.
-    If ResetBack > 0 (e.g. /RG=50), subtract that many from each pointer.
-    If ResetBack = 0, reset to 0 (re-scan everything). }
-  for I := 0 to OLMS_MAX_CONFS - 1 do
+  Result := False;
+  if not FileExists(Filename) then Exit;
+  AssignFile(F, Filename);
+  {$I-} Reset(F, 1); {$I+}
+  if IOResult <> 0 then Exit;
+
+  while not Eof(F) do
   begin
-    if ResetBack > 0 then
+    {$I-} BlockRead(F, Rec, SizeOf(TOLMSUser), BytesRead); {$I+}
+    if BytesRead <> SizeOf(TOLMSUser) then Break;
+    if SameText(ReadTPStr(Rec.UserName, 30), Name) then
     begin
-      User.MsgPointers[I] := User.MsgPointers[I] - ResetBack;
-      if User.MsgPointers[I] < 0 then
-        User.MsgPointers[I] := 0;
-    end
-    else
-      User.MsgPointers[I] := 0;
+      U := Rec;
+      Result := True;
+      Break;
+    end;
   end;
+  CloseFile(F);
 end;
 
-procedure ResetSelectedPointers(var User: TOLMSUser;
-  const Areas: array of Boolean; ResetBack: LongInt);
-var I: Integer;
+procedure SaveUser(const Filename: String; const Name: String;
+  const U: TOLMSUser);
+var
+  F: File;
+  Rec: TOLMSUser;
+  BytesRead: Integer;
+  Pos: LongInt;
 begin
-  { /RS — reset only user-selected areas }
-  for I := 0 to High(Areas) do
-    if (I < OLMS_MAX_CONFS) and Areas[I] then
+  if not FileExists(Filename) then Exit;
+  AssignFile(F, Filename);
+  {$I-} Reset(F, 1); {$I+}
+  if IOResult <> 0 then Exit;
+
+  Pos := 0;
+  while not Eof(F) do
+  begin
+    {$I-} BlockRead(F, Rec, SizeOf(TOLMSUser), BytesRead); {$I+}
+    if BytesRead <> SizeOf(TOLMSUser) then Break;
+    if SameText(ReadTPStr(Rec.UserName, 30), Name) then
     begin
-      if ResetBack > 0 then
-      begin
-        User.MsgPointers[I] := User.MsgPointers[I] - ResetBack;
-        if User.MsgPointers[I] < 0 then
-          User.MsgPointers[I] := 0;
-      end
-      else
-        User.MsgPointers[I] := 0;
+      Seek(F, Pos);
+      BlockWrite(F, U, SizeOf(TOLMSUser));
+      Break;
     end;
+    Inc(Pos, SizeOf(TOLMSUser));
+  end;
+  CloseFile(F);
+end;
+
+{ ---- Credit Control ---- }
+
+function UserGetCredits(const U: TOLMSUser): Integer;
+begin
+  { Credits stored in Tail[0..1] as Word }
+  Result := U.Tail[0] or (U.Tail[1] shl 8);
+end;
+
+function UserHasCredits(const U: TOLMSUser; Cost: Integer): Boolean;
+begin
+  if Cost <= 0 then Result := True
+  else Result := UserGetCredits(U) >= Cost;
+end;
+
+procedure UserDeductCredit(var U: TOLMSUser; Cost: Integer);
+var C: Integer;
+begin
+  C := UserGetCredits(U) - Cost;
+  if C < 0 then C := 0;
+  U.Tail[0] := C and $FF;
+  U.Tail[1] := (C shr 8) and $FF;
+end;
+
+procedure UserAddCredits(var U: TOLMSUser; Amount: Integer);
+var C: Integer;
+begin
+  C := UserGetCredits(U) + Amount;
+  if C > 65535 then C := 65535;
+  U.Tail[0] := C and $FF;
+  U.Tail[1] := (C shr 8) and $FF;
 end;
 
 end.

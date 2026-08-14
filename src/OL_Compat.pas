@@ -47,6 +47,7 @@ type
   TOLStr35  = String[35];    {  36 bytes }
   TOLStr40  = String[40];    {  41 bytes }
   TOLStr60  = String[60];    {  61 bytes }
+  TOLStr56  = String[56];    {  57 bytes }
   TOLStr70  = String[70];    {  71 bytes }
 
   { ---------------------------------------------------------------
@@ -112,7 +113,7 @@ type
     BoolFlags   : array[0..OLMS_MAX_AREAS-1] of Byte; { @ 80: one byte per area }
 
     { Remaining — fills to 478 bytes }
-    Tail        : array[0..9] of Byte; { padding to 478 }
+    Tail        : array[0..14] of Byte; { padding to 478 }
   end;
 
   { ---------------------------------------------------------------
@@ -256,10 +257,10 @@ procedure CfgSetBBSName(var Cfg: TOLMSConfigRaw; const S: String);
 begin WriteTPStr(Cfg.Data[4], 30, S); end;
 
 function CfgGetSysopName(var Cfg: TOLMSConfigRaw): String;
-begin Result := ReadTPStr(Cfg.Data[35], 30); end;
+begin Result := ReadTPStr(Cfg.Data[35], 56); end;
 
 procedure CfgSetSysopName(var Cfg: TOLMSConfigRaw; const S: String);
-begin WriteTPStr(Cfg.Data[35], 30, S); end;
+begin WriteTPStr(Cfg.Data[35], 56, S); end;
 
 function CfgGetPath(var Cfg: TOLMSConfigRaw; Index: Integer): String;
 begin

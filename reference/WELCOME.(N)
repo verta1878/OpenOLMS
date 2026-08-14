@@ -1,0 +1,93 @@
+  
+  Welcome to OLMS, a powerful new mail door that allows you, the user,
+  to perform many actions through control messages.
+
+  These control messages are created in your mail reader just like sending
+  any normal message, except the person you address it to is "OLMS".  The
+  subject of the message is the action you wish it to take.  
+
+  Here are a list of the actions you can perform...
+
+         ADD                     - Joins the conference that the
+                                   message was written in
+
+         DROP                    - Drops the conference that the
+                                   message was written in
+
+         RESET                   - Resets the message pointer in
+                                   the conference that the message
+                                   was written in
+
+         RESET number            - Number of messages back to reset
+                                   the pointer to in the area that the
+                                   message was posted
+
+         KEYWORD keyword word    - Adds a keyword to the user keywords
+                                   listing
+
+         FILTER  filter word     - Adds a filter to the user filter
+                                   listing
+
+         TWIT    twit name       - Adds a twit name to the user twit
+                                   listing
+
+         KEYWORD -keyword word   - Removes a keyword from the user
+                                   keyword listing
+
+         FILTER  -filter word    - Removes a filter from the user
+                                   filter listing
+
+         TWIT    -twit name      - Removes a twit from the user
+                                   twit name listing
+
+         REQUEST filename        - Requests a file from your FDB
+
+         REQUEST conf msgnum     - Requests the files attached
+                                   to msgnum in conf
+
+         REQUEST msgnum          - Requests the files attached
+                                   to msgnum in the current conf
+
+
+    So, for an example...
+
+         From: PETE ROCCA
+           To: OLMS
+         Subj: DROP 134
+
+    Would drop area 134 from your area configuration when the message 
+    was uploaded to the system.
+
+    Another example...
+
+         From: PETE ROCCA
+           To: OLMS
+         Subj: REQUEST GOODGAME.ZIP
+
+    Would request the file GOODGAME.ZIP from the BBS when you uploaded
+    your replies.  
+
+    If you are using the BlueWave format, then most likely your mail
+    reader will provide other ways to perform the same actions, but 
+    even if it does, you can always use this method if you prefer.
+
+    One other thing that OLMS allows you to do, is enter netmail in your
+    offline reader, even in the QWK format.  This can be done simply by
+    placing an at symbol (@) before the fidonet style address you wish
+    to send netmail to.  
+
+    For example, if you wanted to send a message to 1:2401/305, you 
+    would post your message like this...
+
+         From: PETE ROCCA
+           To: BOB SMITH
+         Subj: @1:2401/305
+
+    ...it's as simple as that!
+
+    I hope that you enjoy this new mail door, and if you have any 
+    questions, your Sysop will probably be more than happy to help you
+    out.
+
+    Good luck, and happy mailing!
+       

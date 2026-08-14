@@ -34,7 +34,7 @@ unit OL_Packer;
 interface
 
 uses
-  OL_Config, OL_QWK, OL_MsgCtl, OL_Users, OL_Hudson, OL_DropFile;
+  OL_Compat, OL_Config, OL_QWK, OL_MsgCtl, OL_Users, OL_Hudson, OL_JAM, OL_DropFile;
 
 type
   TPackResult = record
@@ -187,7 +187,7 @@ begin
     for I := 0 to High(Areas) do
     begin
       { Skip unselected areas and blocked areas }
-      if not User.ConfSelected[Areas[I].AreaNum] then Continue;
+      if User.BoolFlags[Areas[I].AreaNum] = 0 then Continue;
       if AreaHasFlag(Areas[I], AF_BLOCKED) then Continue;
       if Areas[I].BaseType <> 0 then Continue;  { Hudson only for now }
 
@@ -195,7 +195,7 @@ begin
       ReadCount := HudsonReadBoard(
         Cfg.MsgBasePath,
         Areas[I].AreaNum,
-        User.MsgPointers[Areas[I].AreaNum],
+        User.BoolFlags[Areas[I].AreaNum],
         Cfg.MaxMsgPerArea,
         Messages);
 
@@ -270,8 +270,8 @@ begin
           Inc(TotalMsgs);
 
           { Update the user's message pointer }
-          if Messages[J].MsgNum > User.MsgPointers[Areas[I].AreaNum] then
-            User.MsgPointers[Areas[I].AreaNum] := Messages[J].MsgNum;
+          if Messages[J].MsgNum > User.BoolFlags[Areas[I].AreaNum] then
+            User.BoolFlags[Areas[I].AreaNum] := Messages[J].MsgNum;
         end;
 
         if Assigned(OnProgress) then
@@ -340,6 +340,10 @@ var
   ArchiveCmd: String;
   BytesRead: LongInt;
   Ch: Char;
+  ConfNum: Word;
+  MsgTo, MsgFrom, MsgSubj: String;
+  LAreaIdx: Integer;
+  LocalAreas: TMsgAreaList;
 begin
   Result.Success := False;
   Result.TotalReplies := 0;
@@ -410,7 +414,32 @@ begin
 
       Inc(Result.TotalReplies);
 
-      { TODO Phase 4: import into Hudson/JAM message base.
+      { Import reply into Hudson/JAM message base }
+        ConfNum := 0 { conference from NDX };
+        MsgTo := QWKFieldToStr(Hdr.MsgTo, 25);
+        MsgFrom := QWKFieldToStr(Hdr.MsgFrom, 25);
+        MsgSubj := QWKFieldToStr(Hdr.Subject, 25);
+
+        if Length(LocalAreas) = 0 then
+          LoadMsgCtl('MESSAGES.CTL', LocalAreas);
+
+        begin
+          LAreaIdx := -1;
+          for J := 0 to High(LocalAreas) do
+            if LocalAreas[J].AreaNum = ConfNum then begin LAreaIdx := J; Break; end;
+
+          if LAreaIdx >= 0 then
+          begin
+            if LocalAreas[LAreaIdx].BaseType = 1 then
+              HudsonWriteMessage(Cfg.MsgBasePath, LocalAreas[LAreaIdx].AreaNum,
+                MsgTo, MsgFrom, MsgSubj, Body,
+                FormatDateTime('mm-dd-yy', Now), FormatDateTime('hh:nn', Now))
+            else if LocalAreas[LAreaIdx].BaseType = 2 then
+              JAMWriteMessage(Cfg.MsgBasePath + LocalAreas[LAreaIdx].Name,
+                MsgTo, MsgFrom, MsgSubj, Body, 1);
+          end;
+        end;
+        { End of import.
         For now, just count the replies as successfully parsed. }
       Inc(Result.Imported);
     end;

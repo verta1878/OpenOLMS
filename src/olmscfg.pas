@@ -20,7 +20,7 @@ program olmscfg;
 uses
   SysUtils,
   App, Objects, Menus, Drivers, Views, Dialogs, MsgBox,
-  OL_Config, OL_MsgCtl;
+  OL_Config, OL_MsgCtl, OL_Screens;
 
 const
   cmSystemInfo  = 1001;
@@ -28,13 +28,21 @@ const
   cmProtocols   = 1003;
   cmPaths       = 1004;
   cmControl     = 1005;
+  cmFilesConfig = 1005;
   cmAreaSetup   = 1006;
+  cmBulletins   = 1020;
+  cmRequesting  = 1021;
+  cmLimits      = 1022;
+  cmShortName   = 1023;
+  cmUserEditor  = 1024;
+  cmMultiLang   = 1025;
   cmSaveConfig  = 1007;
   cmTestConfig  = 1008;
 
 type
   TOLMSCfgApp = object(TApplication)
     Cfg: TOLMSConfig;
+    ScreenArch: TScreenArchive;
     CfgFile: String;
     Modified: Boolean;
     constructor Init;
@@ -45,6 +53,14 @@ type
     procedure DoPaths;
     procedure DoArchivers;
     procedure DoControl;
+    procedure DoProtocols;
+    procedure DoFilesConfig;
+    procedure DoBulletins;
+    procedure DoRequesting;
+    procedure DoLimits;
+    procedure DoShortName;
+    procedure DoUserEditor;
+    procedure DoMultiLang;
     procedure DoAreaSetup;
     procedure DoSave;
     procedure DoTestConfig;
@@ -58,6 +74,14 @@ begin
   if not OLMSLoadConfig(CfgFile, Cfg) then
   begin
     OLMSDefaultConfig(Cfg);
+  { Load SCREENS.DAT for TUI screen templates }
+  if FileExists('SCREENS.DAT') then
+  begin
+    if LoadScreens('SCREENS.DAT', ScreenArch) then
+      { Screens loaded — can display ANSI menus }
+    else
+      ScreenArch.Count := 0;
+  end;
     Modified := True;
   end;
 end;
@@ -236,6 +260,85 @@ begin
     'Max pack size (KB): ' + IntToStr(Cfg.MaxPackSize) + #13#3 +
     'File requesting: ' + BoolToStr(Cfg.AllowFileReq, True) + #13#3 +
     'Duplicate check: ' + BoolToStr(Cfg.DuplicateCheck, True),
+    nil, mfInformation or mfOKButton);
+end;
+
+procedure TOLMSCfgApp.DoProtocols;
+begin
+  MessageBox(
+    #3'Protocol Programs Setup'#13#3 +
+    '6 send + 6 receive protocol commands.'#13#3 +
+    'Configure external protocol programs.'#13#3 +
+    'Wildcards: *P=port, *B=baud, *F=file',
+    nil, mfInformation or mfOKButton);
+end;
+
+procedure TOLMSCfgApp.DoFilesConfig;
+begin
+  MessageBox(
+    #3'Files Configuration'#13#3 +
+    'Upload path, download path, work path.'#13#3 +
+    'Screens path, tagline file path.'#13#3 +
+    'Local, node 1, node 2 directories.',
+    nil, mfInformation or mfOKButton);
+end;
+
+procedure TOLMSCfgApp.DoBulletins;
+begin
+  MessageBox(
+    #3'Bulletins Setup'#13#3 +
+    'Toggle which bulletins to include.'#13#3 +
+    'Press letter of bulletin to toggle.'#13#3 +
+    'Bulletins are packed into QWK/BlueWave.',
+    nil, mfInformation or mfOKButton);
+end;
+
+procedure TOLMSCfgApp.DoRequesting;
+begin
+  MessageBox(
+    #3'Requesting Control'#13#3 +
+    'Allow file requesting: Yes/No'#13#3 +
+    'Allow message file attachments'#13#3 +
+    'Maximum request size (KB)',
+    nil, mfInformation or mfOKButton);
+end;
+
+procedure TOLMSCfgApp.DoLimits;
+begin
+  MessageBox(
+    #3'Limits Setup'#13#3 +
+    'Max messages per area (for download)'#13#3 +
+    'Max packet size (KB)'#13#3 +
+    'Time warning (minutes before timeout)'#13#3 +
+    'Duplicate check entries (200-5000)',
+    nil, mfInformation or mfOKButton);
+end;
+
+procedure TOLMSCfgApp.DoShortName;
+begin
+  MessageBox(
+    #3'Define Shortname Style'#13#3 +
+    'How to abbreviate user names in message headers.'#13#3 +
+    'Options: First Last, F. Last, First L., F.L.',
+    nil, mfInformation or mfOKButton);
+end;
+
+procedure TOLMSCfgApp.DoUserEditor;
+begin
+  MessageBox(
+    #3'User Editor'#13#3 +
+    'View/edit user database.'#13#3 +
+    'Navigate with arrows, toggle DEL/VACATION.'#13#3 +
+    'Professional version feature.',
+    nil, mfInformation or mfOKButton);
+end;
+
+procedure TOLMSCfgApp.DoMultiLang;
+begin
+  MessageBox(
+    #3'Multi-language Support'#13#3 +
+    'RA Language  OLMS Language  Created  Changed  Active'#13#3 +
+    'Map RemoteAccess languages to OLMS language files.',
     nil, mfInformation or mfOKButton);
 end;
 
