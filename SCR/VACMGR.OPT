@@ -1,0 +1,26 @@
+DEIUVHQG
+;
+; REGISTERED USE ONLY!  This file will not be even read when unregistered
+; Registered use gives you many benifits, including the ability to change
+; the color of prompts and the ANS/ASC screens
+;
+; This is the file that specifies what the menu item keys should be for
+; the Vacation manager.  (-VACMGR.* screen files)
+;
+; You can use this file to override the defaults, if you change the screens
+; to show different selections.  Only the first line of this file is read
+; and no error checking is done, so be sure that the format is correct.
+;
+; To disable any menu option, simply put an asterisk (*) for the menu
+; key, and OLMS will restrict this item.
+;
+; Order of keys should represent...
+;
+; Download
+; Erase saved packets
+; Install vacation mode
+; Uninstall vacation mode
+; View settings
+; Help
+; Quit
+; Goodbye

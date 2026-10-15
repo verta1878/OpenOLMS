@@ -1,0 +1,36 @@
+IFBNWAPMRSELT7VCQ
+;
+; REGISTERED USE ONLY!  This file will not be even read when unregistered
+; Registered use gives you many benifits, including the ability to change
+; the color of prompts and the ANS/ASC/RIP screens, multiple language
+; support and more...
+;
+; This is the file that specifies what the menu item keys should be for
+; the Main Menu, in single level menu style.  (-PREF.* screen files)
+;
+; You can use this file to override the defaults, if you change the screens
+; to show different selections.  Only the first line of this file is read
+; and no error checking is done, so be sure that the format is correct.
+;
+; To disable any menu option, simply put an asterisk (*) for the menu
+; key, and OLMS will restrict this item.
+;
+; Order of keys should represent...
+;
+; Indexes
+; File scan
+; Bulletin selections
+; News file
+; Welcome screens
+; Archiver
+; Protocol
+; Modify pointers
+; Restore pointers
+; Short conference listing
+; Extension numbering
+; Limiting factors
+; Toggle global personal
+; 7bit menus
+; View settings
+; Change packet format
+; Quit back to main menu -> Go back to -MAIN2.* screen

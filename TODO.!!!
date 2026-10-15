@@ -1,0 +1,22 @@
+[ ] downloading files (freqs) doesn't update the FDB
+[ ] downloading files, if two files with same name only grabs one
+[ ] configurable prompt for "ALL" / 'g', etc..
+[ ] Maximus support? http://oeonline.com/~garyg/maximus
+[ ] Check lastread pointers on HMB, check if counting areas that don't exist when finding high water.
+[ ] maintain to remove flags from areas that are non-existant..
+[x] option to disable the "xx minutes left"
+[x] change color of the "xx minutes left" (always gray)
+[x] hudson base is putting '@address:x/x' in the subject line in bw mode too
+[x] if bw subject is blank, getting crap
+[x] When quitting editing a user the Save Changes (Y/n) prompt requires a Y, not just a return. (works for me)
+[-] (OLMS) Screen output (report) while processing "toreader.ext" :).
+[-] Join "ALL" current group only.
+[-] Single column area display for usenet areas
+[-] Charge credits for certain areas... (john.shaw@cybrcity.com)
+[-] Daily max packets.
+[-] Default template for new users (not until 3.0)
+[!] Date on startup (already did)
+[!] empty to field gives last one entered on upload (likely a bluewave problem, I've fixed the subject one as above)
+[!] Currently "w" only applies to "a", however I'll extend that to apply to "p" and "g" as well. (think it already does)
+[!] in editor allow short cutting by typing in first few letters. (can't keys are defined for other things)
+[!] "Ignore Limits" for the user in question fixes vacation not working? (I never could reproduce this one, was a Ronnie thing)

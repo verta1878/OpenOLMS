@@ -1,243 +1,105 @@
-# OpenOLMS — Open Offline Mail System
+# OpenOLMS — Online Message System
 
-Clean-room reimplementation of Peter Rocca's OLMS (Offline Mail System,
-Version 2000) in Free Pascal with ANSI/RIP rendering.
+OLMS 2001 source code released
+by the original author. Preserved and maintained by the crew (verta1878) as OpenOLMS under GPLv3.
 
-GPLv3 — Copyright (C) 2026 verta1878, sysop/0, wrench, kiddo, evga.
-No original source code used. Reimplemented from published documentation.
+## What This Is
 
-## What It Does
+OLMS (Online Message System) is a BBS door program that provides
+offline mail reading and writing for BBS callers. It supports Hudson
+(HMB) and JAM message bases, BlueWave offline mail packets, file
+requests, vacation messaging, multi-language support, and full-screen
+chat.
 
-A QWK/QWKE/BlueWave compatible offline mail system for BBS. Two sides:
+## Source
 
-**BBS side (door):** scans message areas, packs QWK, accepts REP uploads.
-**User side (client):** connects to BBS, downloads QWK via Zmodem, reads
-mail offline with ANSI/RIP rendering, composes replies with spell check,
-uploads .REP.
+Original author source received 2026-10-15. Turbo Pascal, uses
+DM6000 (Doorman BBS door framework). 22 Pascal source files,
+14,257 lines.
 
-## Programs (8)
+### Programs
 
-| Binary | Source | Lines | What |
-|--------|--------|-------|------|
-| OLMS.EXE | openolms.pas | 436 | Main BBS door — QWK/QWKE/BlueWave offline mail |
-| CONFIG.EXE | olmscfg.pas | 307 | Configuration editor (12 screens, FV TUI) |
-| EDITOR.EXE | editor.pas | 661 | Standalone message editor (CRT, word wrap col 72) |
-| MAINTAIN.EXE | olmsmnt.pas | 1135 | Database maintenance/packing |
-| USERCONF.EXE | userconf.pas | 376 | User self-configuration (archiver, protocol, areas) |
-| UPGRADE1.EXE | upgrade1.pas | 245 | Config + message area upgrade to v2000 |
-| UPGRADE2.EXE | upgrade2.pas | 247 | User database upgrade to v2000 |
-| MOLMS.EXE | molms.pas | 2602 | Win32 offline mail client (bonus — connect, read, reply) |
+| Program | Source | Lines | What |
+|---------|--------|-------|------|
+| OLMS2001.EXE | OLMS2001.PAS | 3,849 | Main door — offline mail, message reading/writing |
+| CONFIG.EXE | CONFIG.PAS | 2,867 | Sysop configuration tool |
+| (maintenance) | MAINTAIN.PAS | 733 | Database maintenance |
+| (editor) | EDITOR.PAS | 965 | Message editor |
 
-## mterm RIP Engine (kiddo)
+### Units
 
-RIPscrip v1.54 graphics engine for BBS terminals. 640×350 EGA canvas
-with BGI-compatible rendering. All 6 development phases complete.
+| Unit | Source | Lines | What |
+|------|--------|-------|------|
+| U_UNIT | U_UNIT.PAS | 2,513 | Core utility functions |
+| U_NEW | U_NEW.PAS | 1,336 | New user handling |
+| U_JAM | U_JAM.PAS | 709 | JAM message base support |
+| U_HMB | U_HMB.PAS | 539 | Hudson Message Base support |
+| U_LANG | U_LANG.PAS | 365 | Multi-language support |
+| U_REG | U_REG.PAS | — | Registration |
 
-| File | Lines | What |
-|------|-------|------|
-| mtrip.pas | 632 | RIPscrip command dispatcher (49 commands) |
-| mtripgfx.pas | 840 | Pixel rendering engine (Bresenham, FloodFill, Bezier) |
-| mtrip_test.pas | 55 | Smoke test harness |
-| rip_font8x8.inc | — | 8x8 bitmap font data |
-
-## MOLMS — The Offline Mail Client
-
-Not a door — the user's program. Complete offline mail workflow:
-
-```
-Connect -> auto-login -> enter mail door -> Zmodem recv .QWK
-  -> disconnect -> unpack QWK -> READ OFFLINE -> compose replies
-  -> spell check -> pack .REP -> reconnect -> Zmodem send .REP
-```
-
-Auto Mail Run (Alt-M): one key does the full cycle.
-
-Features: BBS address book, area navigation (Tab/Shift-Tab),
-message threading, keyword search, ANSI/RIP message rendering,
-reply editor with quoting and Hunspell spell check.
-
-## DOS Door (openolms_dos.exe)
-
-Classic BBS door. Reads DORINFO1.DEF or DOOR.SYS. ANSI menus.
-
-```
-openolms              interactive mode
-openolms /D           auto download
-openolms /U           auto upload
-openolms /RG          reset all area pointers
-openolms /RS          reset selected area pointers
-openolms /RG=50       reset back 50 messages
-```
-
-## Formats
-
-| Format | Read | Write |
-|--------|------|-------|
-| QWK | yes | yes |
-| QWKE | planned | planned |
-| BlueWave | yes | yes |
-
-| Message Base | Read |
-|-------------|------|
-| Hudson (QuickBBS/RA) | yes |
-| JAM | yes |
-| Mystic (via MDL) | stub |
-
-## Features
-
-- QWK/BlueWave packet packing and unpacking
-- Hudson and JAM message base reading
-- ANSI terminal emulation (CSI/SGR, 16 color, cursor, scrollback)
-- RIPscrip v1.54 graphics (640x350 EGA canvas, 42 commands)
-- Per-user keyword filtering (include/exclude mode)
-- Twit list (blocked senders)
-- Per-user message pointers with reset (/RG, /RS, /RG=N)
-- DORINFO1.DEF and DOOR.SYS drop file parsing
-- Telnet, Serial/Modem, FOSSIL connections
-- Zmodem (>2GB, Int64 fix), Ymodem, Xmodem, Kermit transfers
-- BBS address book with auto-login
-- Reply editor with word wrap at column 72
-- Quote prefixing (author initials + ">")
-- Hunspell spell check (dynamic loading, optional)
-- Session capture to log file
-- Phonebook with saved connections
-
-## Source Files (37 units)
-
-### OpenOLMS Core (13 units)
+### Includes
 
 | File | Lines | What |
 |------|-------|------|
-| OL_QWK.pas | 259 | QWK packet format (128-byte blocks, CONTROL.DAT, NDX) |
-| OL_Config.pas | 176 | OLMS.CFG configuration records |
-| OL_DropFile.pas | 275 | DORINFO1.DEF + DOOR.SYS drop file parser |
-| OL_MsgCtl.pas | 195 | MESSAGES.CTL conference control (64-byte records) |
-| OL_Users.pas | 141 | Per-user settings + message pointers |
-| OL_Hudson.pas | 328 | Hudson message base (MSGHDR/MSGTXT/MSGIDX/MSGINFO) |
-| OL_JAM.pas | 425 | JAM message base (JHR/JDT/JDX/JLR + CRC-32) |
-| OL_Packer.pas | 423 | QWK packer + REP unpacker |
-| OL_Filter.pas | 275 | Keyword filtering (include/exclude) + twit list |
-| OL_BlueWave.pas | 199 | BlueWave format (INF/MIX/FTI/DAT/UPL) |
-| OL_Transfer.pas | 281 | Automated mail run (connect, login, download, upload) |
-| OL_Editor.pas | 231 | Reply editor — word wrap, quoting, spell check |
-| OL_MDL.pas | 225 | Mystic Development Library interface stub |
+| BBSTYPE.INC | 10 | Build switch — BBS_RA1 or BBS_RA2 |
+| DROPTYPE.INC | 201 | BBS drop file data structures (RA 1.x + 2.x, EXITINFO) |
+| BWAVE212.INC | 294 | BlueWave 2.12 offline mail packet structures |
 
-### ANSI / RIP Rendering (4 units)
+### Build Switches (BBSTYPE.INC)
 
-| File | Lines | What |
-|------|-------|------|
-| mtterm.pas | 419 | ANSI CSI/SGR terminal — parser, scrollback, color |
-| mtrip.pas | 267 | RIPscrip v1.54 command dispatcher (42 commands) |
-| mtripgfx.pas | 409 | 640x350 EGA pixel canvas — line, circle, fill, BMP |
-| mtcapture.pas | 74 | Session capture to log file |
+| Define | 0 (disabled) | 1 (enabled) |
+|--------|-------------|-------------|
+| BBS_RA1 | Not targeting RemoteAccess 1.x | Build for RA 1.11 (uses C_RA111 unit) |
+| BBS_RA2 | Not targeting RemoteAccess 2.x | Build for RA 2.x (default, enables all features) |
+| LOWMEMORY | Normal memory mode | Reduced memory footprint |
+| BBS_FILEREQUEST | No file request support | File request/download support (auto-enabled by BBS_RA2) |
+| MESSAGE_JAM | No JAM support | JAM message base support (auto-enabled by BBS_RA2) |
+| PROVERSION | Compile error | Pro version features (auto-enabled by BBS_RA2) |
 
-### Connection + Transfer (12 units)
+## Compiler
 
-| File | Lines | What |
-|------|-------|------|
-| mtconn.pas | 164 | Connection manager — Telnet, Serial, FOSSIL |
-| mtserial.pas | 125 | AT modem dialer (DOS COM1-COM4) |
-| mtphone.pas | 136 | Phonebook — saved BBS connections |
-| mtxfer.pas | 110 | File transfer framework |
-| mtconfig.pas | 118 | Persistent settings |
-| m_prot_base.pas | 894 | Protocol base class + state machine |
-| m_prot_zmodem.pas | 2530 | Zmodem — Int64 fix for >2GB transfers |
-| m_protocol_xmodem.pas | 357 | Xmodem 1K/CRC |
-| m_protocol_ymodem.pas | 307 | Ymodem batch |
-| m_protocol_kermit.pas | 565 | Kermit sliding window |
-| m_protocol_queue.pas | 170 | Transfer queue manager |
-| m_crc.pas | 173 | CRC-16 CCITT + CRC-32 tables |
+Turbo Pascal 7.0. Requires:
+- DM6000 unit (Doorman BBS door framework)
+- JAMCRC32 + JAM units (JAM message base library)
+- Crt, Dos (standard TP units)
 
-### Spell Check (2 units)
+## Screens
 
-| File | Lines | What |
-|------|-------|------|
-| mt_spell.pas | 179 | Hunspell dynamic loader (Win/Linux/macOS) |
-| OL_Editor.pas | 231 | Reply editor with spell check integration |
+Full ANSI/ASCII/RIP screen set in `SCR/` (20 screens x 3 formats = 60 files).
+Language files: English, French, Spanish.
 
-### Programs (8)
+## Utilities
 
-| File | Lines | What |
-|------|-------|------|
-| openolms.pas | 436 | Main BBS door (FV TUI) |
-| openolms_dos.pas | 353 | DOS door wrapper (ANSI menus) |
-| olmscfg.pas | 307 | Configuration editor (FV TUI) |
-| editor.pas | 661 | Standalone message editor (CRT) |
-| olmsmnt.pas | 1135 | Database maintenance |
-| userconf.pas | 376 | User self-configuration |
-| upgrade1.pas | 245 | Config + area upgrade |
-| upgrade2.pas | 247 | User database upgrade |
-| molms.pas | 2602 | Win32 offline mail client |
+| Tool | What |
+|------|------|
+| 20XTO250.PAS | Upgrade user data from 2.0x to 2.50 format |
+| PRO-2-SW.PAS | Convert ProBoard to SuperWild format |
+| SW-2-PRO.PAS | Convert SuperWild to ProBoard format |
+| USERCONF.PAS | User configuration tool |
 
-### DOS Door Support (1 unit)
-
-| File | Lines | What |
-|------|-------|------|
-| OL_ANSI.pas | 244 | Pure ANSI console output for DOS doors |
-
-## Architecture
-
-```
-BBS Side:                           User Side:
-
-openolms_dos.exe                    MOLMS (molms.exe)
-  |                                   |
-  |-- Drop file parser                |-- Connect (Telnet/Serial/FOSSIL)
-  |-- Message base reader             |-- Auto-login + enter door
-  |   (Hudson / JAM)                  |-- Zmodem receive .QWK
-  |-- QWK packer                      |-- ANSI/RIP message rendering
-  |-- REP unpacker                    |-- Reply editor + spell check
-  |-- Keyword filter                  |-- REP packer
-  |-- Area selection                  |-- Zmodem send .REP
-  '-- ANSI menus                      '-- BBS address book + phonebook
-```
-
-## Data Files
-
-| File | Format | What |
-|------|--------|------|
-| OLMS.CFG | binary | Main configuration |
-| MESSAGES.CTL | binary, 64-byte records | Conference area list |
-| USERS.DAT | binary | Per-user settings |
-| *.KEY | text | Keyword filter (one per user) |
-| *.TWT | text | Twit list (one per user) |
-| *.QWK | ZIP archive | Downloaded mail packet |
-| *.REP | ZIP archive | Upload reply packet |
-| DORINFO1.DEF | text, 12 lines | BBS drop file |
-| DOOR.SYS | text, 20 lines | BBS drop file (PCBoard) |
-| mterm.cfg | binary | Terminal settings |
-| mterm.phn | binary | Phonebook entries |
-
-## Docs
+## Documentation
 
 | File | What |
 |------|------|
-| README.md | This file |
-| MANUAL.md | User manual — keyboard, connecting, formats, building |
-| OLMS_CFG_FORMAT.md | OLMS.CFG binary format documentation |
-| SPELL_SETUP.md | Hunspell installation guide |
-| index.htm | Color-coded documentation index |
+| OLMS.DOC | User manual |
+| HISTORY.DOC | Version history (1.00.10 through 2.00.1 beta 3) |
+| UPGRADE.DOC | Upgrade instructions |
+| SUPPORT.DOC | Support information |
+| PROBOARD.DOC | ProBoard integration notes |
+| TODO.!!! | Open items and known issues |
 
-## Credits
+## History
 
-| Who | What |
-|-----|------|
-| Peter Rocca | Original OLMS author (MCC, 1994-1998) |
-| verta1878 | Project lead, architecture |
-| Leslie Given | Co-correspondence for author permission |
-| sysop/0 | Terminal, serial UART, compiler |
-| evga | Display, RIPView |
-| kiddo | Serial IRQ, ring buffer, protocols |
-| wrench | Network architecture, OpenOLMS reimplementation |
-| g00r00 | Mystic BBS, protocol code (GPLv3) |
+This source was preserved by the crew (verta1878) after the original
+author made contact and shared it. An earlier clean-room recreation
+(OpenOLMS) existed before this source was available — that work is
+archived in the attic/ directory as historical reference.
+
+## Checksums
+
+See `CHECKSUMS.md` for source + binary hashes, `MD5SUMS.txt` and
+`SHA256SUMS.txt` for all 142 files.
 
 ## License
 
-GPLv3 — GNU General Public License v3.0
-
-Clean-room reimplementation from published documentation only.
-No decompilation, no original source code used.
-
-Original OLMS: proprietary shareware ($25), Copyright Peter Rocca,
-Multiboard Communications Centre, 1994-1998, Ontario Canada.
-OpenOLMS created with author's permission.
+GPLv3. Original author source released with permission.

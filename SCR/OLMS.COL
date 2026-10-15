@@ -1,0 +1,45 @@
+; REGISTERED USE ONLY!  This file will not be even read when unregistered
+; Registered use gives you many benifits, including the ability to change
+; the color of prompts and the ANS/ASC/RIP screens, multiple language 
+; support and more...
+;
+; Remember that these colors must be in the same order, left justified
+; and have either nothing or a space after them
+;
+; Color chart:
+;     0 - Black      1 - Blue        2 - Green      3 - Cyan
+;     4 - Red        5 - Purple      6 - Brown      7 - Lt.Gray
+;     8 - Dk.Gray    9 - Lt.Blue    10 - Lt.Green  11 - Lt.Cyan
+;    12 - Lt.Red    13 - Lt.Purple  14 - Yellow    15 - White
+;
+15      ; Input field foreground
+4       ; Input field background
+15      ; 'Press space' prompt
+15      ; Titles
+12      ; Errors
+4       ; ÄÄÄÄÄÄ Lines
+15      ; Questions
+7       ; Data
+7       ; Prompts
+14      ; Conference numbers
+15      ; Conference names
+7       ; Flags
+15      ; General text
+7       ; Options
+14      ; UPLOAD/DOWNLOAD mode title
+14      ; Spinner bar
+11      ; Logoff prompt/info
+10      ; Sucessful transfer
+8       ; 'Last download' message
+14      ; New messages count
+14      ; Packed messages count
+7       ; Keyword/filter/personal messages count
+14      ; Status info messages (Number files/messages/time)
+15      ; Values of above
+11      ; No mail to pack
+11      ; Ask if want to pack
+11      ; Scanning files
+14      ; Compressing/Decompressing/Transfer messages
+7       ; Reply TO: name
+15      ; Yes/No color
+14      ; Private message flag

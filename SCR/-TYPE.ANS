@@ -1,0 +1,22 @@
+[40m[2J[40m
+[0;1m   [0mÛßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßÛ
+   Û[25C[1mChange Packet Format[26C[0mÛ[1;30mÛ
+   [0mÛ [31mÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄ [37mÛ[1;30mÛ
+   [0mÛ  This is where you can select  what type of mail packet  you wish to  Û[1;30mÛ
+   [0mÛ  have created for you.  It is very important you choose one that you  Û[1;30mÛ
+   [0mÛ  have an appropriate offline mail reader for.[25CÛ[1;30mÛ
+   [0mÛ[71CÛ[1;30mÛ
+   [0mÛ  ([1;33mQ[0m)WK[6CThis is the most standard type of mail packet.   If you   Û[1;30mÛ
+   [0mÛ[13Care in doubt, then this is a good one to choose.[10CÛ[1;30mÛ
+   [0mÛ[71CÛ[1;30mÛ
+   [0mÛ  ([1;33mE[0m)QWK[5CIf your mail reader can support QWKE extensions  or can   Û[1;30mÛ
+   [0mÛ[13Cdisplay 'long description names', then choose this one.   Û[1;30mÛ
+   [0mÛ[13CEven if your mail reader  is only QWK compatible,  this   Û[1;30mÛ
+   [0mÛ[13Cone will still work fine.[33CÛ[1;30mÛ
+   [0mÛ[71CÛ[1;30mÛ
+   [0mÛ  ([1;33mB[0m)lueWave This one is for BlueWave mail packets.  You must have a   Û[1;30mÛ
+   [0mÛ[13Cmail reader that is compatible with "BlueWave 2.11" and   Û[1;30mÛ
+   [0mÛ[13Chigher (creates *.UPL files) for this one to work.[8CÛ[1;30mÛ
+   [0mÛ [31mÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄ [37mÛ[1;30mÛ
+   [0mÛÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÛ[1;30mÛ
+[5Cßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßß[0m

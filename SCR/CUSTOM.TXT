@@ -1,0 +1,14 @@
+
+CUSTOM.ZIP -> CUSTOM.TXT
+
+Once you have registered, you can extract these files to your OLMS directory
+or your language directory and edit them into anything you wish, in order to 
+customize your display/keys.
+
+Any files that are needed, but not present will be loaded from the SCREENS.DAT
+file.  Please note, that even if you replace all the screens, SCREENS.DAT must 
+still be present in your OLMS directory.
+
+The *.OPT files are for redefining the keys that corrospond the -MAIN, -MAIN2
+and -PREF ASC/ANS/RIP screens.  The KEYWORD.OPT reflects the three defined
+keys for Global Keyword, Global Personal and Twit Personal.

@@ -1,0 +1,20 @@
+!|1K|*|W00|=00000003|c07|R1P1HFY7D|=00000001|L1P2FFY2F
+!|L1P53FY53|S0B08|B1R2IFW51|Y06000300|c07|Y00000100
+!|c04|L1X24D224|LD224DF1R|LDF1RDP2C|LDP2CDW24|LDW24FP24
+!|c07|Y02000400|@D81VOLMS|c0F|Y00000000|@1Z1TRestore pointers     
+!|Y00000100
+!|1B00000201DY0208080F080700020E07000000
+!|1U2A364Z482H00<>Yes<>Y
+!|1U5F368A482600<>No<>N|#|#|#
+!|c07
+!|@8X30If  you have  lost or damaged
+!|@8X3Dthe last mail packet, you can
+!|@8X3Ruse  the POINTERS.DAT file in
+!|@8X45the last successful  download
+!|@8X4Ito reset your pointers.
+!|c0E
+!|@2A5HIf this system renumbers  its message  bases  every  night,
+!|@2A5Tand  the POINTERS.DAT file is not from today, then by doing
+!|@2A66this,  you could end up missing some new messages.  In this 
+!|@2A6Icase, you should first  try to reset the  message  pointers
+!|@2A6Umanually, using the (M)odify pointers option.

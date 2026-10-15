@@ -1,0 +1,18 @@
+[40m[2J[40m
+
+[0;1m   [0mÛßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßÛ   ÛßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßÛ
+   Û[8C[1mRestore Pointers[9C[0mÛ[1;30mÛ  [0mÛ[13C[1;33mWARNING[13C[0mÛ[1;30mÛ
+   [0mÛ [31mÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄ [37mÛ[1;30mÛ  [0mÛ [31mÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄ [37mÛ[1;30mÛ
+   [0mÛ[33CÛ[1;30mÛ  [0mÛ  If this system renumbers  its  Û[1;30mÛ
+   [0mÛ[14C([1;33mY[0m)es[14CÛ[1;30mÛ  [0mÛ  message  bases  every  night,  Û[1;30mÛ
+   [0mÛ[14C([1;33mN[0m)o[15CÛ[1;30mÛ  [0mÛ  and  the POINTERS.DAT file is  Û[1;30mÛ
+   [0mÛ[33CÛ[1;30mÛ  [0mÛ  not from today, then by doing  Û[1;30mÛ
+   [0mÛ [31mÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄ [37mÛ[1;30mÛ  [0mÛ  this,  you could  be  missing  Û[1;30mÛ
+   [0mÛ  If  you have  lost or damaged  Û[1;30mÛ  [0mÛ  some new messages. If this is  Û[1;30mÛ
+   [0mÛ  the last mail packet, you can  Û[1;30mÛ  [0mÛ  the case, then you should try  Û[1;30mÛ
+   [0mÛ  use  the POINTERS.DAT file in  Û[1;30mÛ  [0mÛ  to reset the message pointers  Û[1;30mÛ
+   [0mÛ  the last successful  download  Û[1;30mÛ  [0mÛ  manually,  using the (M)odify  Û[1;30mÛ
+   [0mÛ  to reset your pointers.[8CÛ[1;30mÛ  [0mÛ  pointers option.[15CÛ[1;30mÛ
+   [0mÛ [31mÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄ [37mÛ[1;30mÛ  [0mÛ [31mÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄ [37mÛ[1;30mÛ
+   [0mÛÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÛ[1;30mÛ  [0mÛÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÛ[1;30mÛ
+[5Cßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßß    ßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßß[0m
