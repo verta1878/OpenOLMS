@@ -315,6 +315,9 @@ Procedure LoadLastRead;
 Begin
   (* Load lastread pointers *)
   HMB_LoadLastReads;
+  { Fix 5: Zero lastread for areas that no longer exist }
+  For Count := 0 To High(LastReads) Do
+    If Not ValidConference(Count) Then LastReads[Count] := 0;
   JAM_LoadLastReads;
 End;
 
@@ -1656,6 +1659,31 @@ Begin
   GetAttachedPath := p;
 End;
 
+{ Update FDB download counter after successful file request }
+Procedure UpdateFDB(Area: Word; RecNo: LongInt; FileName: String);
+Var
+  fU: File;
+  dU: FILESHDRrecord;
+Begin
+  If OpenFile(fU,Setup^.FileBasePath+'HDR\FDB'+ZeroPad(Area,0)+'.HDR'
+                ,'W',Sizeof(FILESHDRrecord),faReadWrite+faDenyWrite) Then
+    Begin
+      If RecNo < FileSize(fU) Then
+        Begin
+          Seek(fU,RecNo);
+          BlockRead(fU,dU,1);
+          If UpcaseStr(dU.Name) = UpcaseStr(FileName) Then
+            Begin
+              Inc(dU.TimesDL);
+              dU.LastDL := DateToJulian;
+              Seek(fU,RecNo);
+              BlockWrite(fU,dU,1);
+            End;
+        End;
+      Close(fU);
+    End;
+End;
+
 Function GetFiles: Word;
 Const
   MaxQueue = 50;
@@ -1684,6 +1712,8 @@ Var
   FileQueueCosts:     Array[1..MaxQueue] Of Word;
   FileQueueAttribute: Array[1..MaxQueue] Of Byte;
   FileQueueWhere:     Array[1..MaxQueue] Of WhereRec;
+  FileQueueArea:      Array[1..MaxQueue] Of Word;
+  FileQueueRecNo:     Array[1..MaxQueue] Of LongInt;
   KBytesLeft, TotalFilesPacked, TotalFiles, Bytes, TotalBytes, AvailableCredits, Seconds, TotalSeconds: Longint;
 Begin
   GetFiles := 0;
@@ -1797,6 +1827,8 @@ Begin
                           Begin
                             FileQueuePaths[Count] := dC.FilePath;
                             FileQueueFound[Count] := True;
+                            FileQueueArea[Count]  := Area;
+                            FileQueueRecNo[Count] := (FilePos(fH)-Result+Loop);
                             FileQueueSize[Count]  := dH[Loop].Size;
                             If dH[Loop].Password <> '' Then FileQueueAttribute[Count] := 1
                             Else If (dH[Loop].Cost>AvailableCredits) And Not User.PostBill Then FileQueueAttribute[Count] := 2
@@ -1864,6 +1896,9 @@ Begin
                   Else If PackFile(FileQueuePaths[Count],FileQueueNames[Count]) Then
                     Begin
                       Inc(TotalFilesPacked);
+                      { Fix 1: Update FDB download counter }
+                      If FileQueueAttribute[Count] <> 10 Then
+                        UpdateFDB(FileQueueArea[Count],FileQueueRecNo[Count],FileQueueNames[Count]);
                       Inc(GlobalPendingCredits,FileQueueCosts[Count]);
                       Inc(TotalSeconds,Seconds);
                       Inc(TotalBytes,Bytes);
@@ -3186,7 +3221,7 @@ OLMSCOMMANDTAG:
             Begin
               If (Ret > 0) And (Ret<=MaxAreas) Then
                 Begin
-                  If Extra = 'ALL'      Then Human^.Flags[Ret] := fALL;
+                  If UpcaseStr(Extra) = UpcaseStr(LANG(L_All)) Then Human^.Flags[Ret] := fALL;
                   If Extra = 'PERSONLY' Then Human^.Flags[Ret] := fPERSONAL;
                   If Extra = 'PERS+ALL' Then Human^.Flags[Ret] := fGENERAL;
                   If Ok Then Inc(Human^.Flags[Ret],fSELF);

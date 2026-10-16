@@ -1,9 +1,9 @@
-[ ] downloading files (freqs) doesn't update the FDB
-[ ] downloading files, if two files with same name only grabs one
-[ ] configurable prompt for "ALL" / 'g', etc..
-[ ] Maximus support? http://oeonline.com/~garyg/maximus
-[ ] Check lastread pointers on HMB, check if counting areas that don't exist when finding high water.
-[ ] maintain to remove flags from areas that are non-existant..
+[x] downloading files (freqs) doesn't update the FDB (FIXED: UpdateFDB procedure added, increments TimesDL and sets LastDL after successful PackFile)
+[x] downloading files, if two files with same name only grabs one (works as designed: one queue slot per file request, second copy requires second request)
+[x] configurable prompt for "ALL" / 'g', etc.. (FIXED: 'ALL' comparison now uses LANG(L_All) language string instead of hardcoded)
+[-] Maximus support? http://oeonline.com/~garyg/maximus (deferred: feature request, not a bug; would need new BBSTYPE.INC switch + drop file parser)
+[x] Check lastread pointers on HMB, check if counting areas that don't exist when finding high water. (FIXED: zero lastread for invalid areas after HMB_LoadLastReads)
+[x] maintain to remove flags from areas that are non-existant.. (FIXED: clear Flags[] for areas beyond NumConf in MAINTAIN.PAS)
 [x] option to disable the "xx minutes left"
 [x] change color of the "xx minutes left" (always gray)
 [x] hudson base is putting '@address:x/x' in the subject line in bw mode too

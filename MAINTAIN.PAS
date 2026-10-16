@@ -612,6 +612,8 @@ Begin
           Human^.RecordNumber := n;
           If DupeBit Then Begin Inc(QFix); Human^.QWKID := FindEmptyBit; End;
           SetBit(Human^.QWKID);
+          { Fix 6: Clear flags for areas that no longer exist }
+          For c := NumConf+1 To MaxAreas Do Human^.Flags[c] := 0;
           {$IFDEF PROVERSION}
           If DirInfo(VacDir,VacOld,VacBytes) Then
             Begin
