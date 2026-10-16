@@ -1162,6 +1162,26 @@ Begin
   Else IsArea := False;
 End;
 
+{ Fix 4: Per-area credit charging }
+Function GetAreaCredit(Area: Word): Word;
+Var
+  f: File;
+  Credit: Word;
+Begin
+  GetAreaCredit := 0;
+  Credit := 0;
+  If OpenFile(f,MainDir+'AREACRDT.DAT','R',Sizeof(Word),faReadOnly+faDenyNone) Then
+    Begin
+      If Area <= FileSize(f) Then
+        Begin
+          Seek(f,Area-1);
+          BlockRead(f,Credit,1);
+        End;
+      CloseFile(f);
+    End;
+  GetAreaCredit := Credit;
+End;
+
 Function SeeGroup(Group, Group1, Group2, Group3: Word; Atr, Mask: Byte): Boolean;
 Begin
 
@@ -2476,7 +2496,8 @@ Begin
 
   If Is(Flags,fCONNECT) Then Pack := True
   Else If Personal And Human^.GlobalPersonal Then Pack := True
-  Else If Written And Not Is(Flags,fSELF) Then Begin Pack := False; Maybe := False; End
+  Else If Written And Is(Flags,fSELF) Then Pack := True
+  Else If Written Then Begin Pack := False; Maybe := False; End
   Else If (Pvt And Not PvtRights) And Not (Personal Or Written Or Is(Flags,fCONNECT))
        Then Begin Pack := False; Maybe := False; End
   Else If Is(Flags,fKEYWORD) Or Human^.GlobalKeywords Then Maybe := True;

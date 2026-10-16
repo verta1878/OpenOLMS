@@ -1896,10 +1896,10 @@ Begin
   Writeln(' U) Use "aw" in forced areas:');
   Writeln(' V)  Add registered tearline:');
   Writeln(' W) Color for minutes remain:');
-{  Writeln(' X)                         :');
-  Writeln(' Y)                         :');
-  Writeln(' Z)                         :');
-  Writeln(' 1)                         :');
+  Writeln(' X)    Daily max packets:');
+  Writeln(' Y)  New user template:');
+  Writeln(' Z)  Per-area credits:');
+{  Writeln(' 1)                         :');
   Writeln(' 2)                         :');
   Writeln(' 3)                         :');
   Writeln(' 4)                         :');
@@ -1983,6 +1983,9 @@ Begin
     Writeln(YN(Setup^.IncSelfInForced));
     Writeln(YN(Setup^.Gloat));
     Writeln(ZeroPad(Setup^.MinuteCol,-2));
+    If Setup^.UNUSED[17] = 0 Then Writeln('Off') Else Writeln(ZeroPad(Setup^.UNUSED[17],0));
+    Writeln(YN(Setup^.UNUSED[18] > 0));
+    Write(YN(FileExists(MainDir+'AREACRDT.DAT')));
 
     Repeat
       Key := UpCase(Readkey);
@@ -2045,6 +2048,15 @@ Begin
         'U': Setup^.IncSelfInForced := Not Setup^.IncSelfInForced;
         'V': Setup^.Gloat := Not Setup^.Gloat;
         'W': Begin Inc(Setup^.MinuteCol); If Setup^.MinuteCol > 15 Then Setup^.MinuteCol := 0; End;
+        'X': Begin
+               Window(73,8,77,22); Gotoxy(1,5);
+               Str(Setup^.UNUSED[17],Temp);
+               GetString2(Temp,3,5,15,Number);
+               Val(Temp,Value,Code);
+               If (Code = 0) And (Value <= 255) Then Setup^.UNUSED[17] := Byte(Value);
+             End;
+        'Y': If Setup^.UNUSED[18] = 0 Then Setup^.UNUSED[18] := 1 Else Setup^.UNUSED[18] := 0;
+        'Z': Begin Window(2,23,78,23); SetColor(LightCyan); Write(' AREACRDT.DAT: 1 Word/area, 0=free. Create with AREATOOL or hex editor.'); Readkey; End;
       End;
     Until Key In ['A'..'Z','0'..'9',#27];
   Until Key = #27;

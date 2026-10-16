@@ -9,14 +9,14 @@
 [x] hudson base is putting '@address:x/x' in the subject line in bw mode too
 [x] if bw subject is blank, getting crap
 [x] When quitting editing a user the Save Changes (Y/n) prompt requires a Y, not just a return. (works for me)
-[-] (OLMS) Screen output (report) while processing "toreader.ext" :).
-[-] Join "ALL" current group only.
-[-] Single column area display for usenet areas
-[-] Charge credits for certain areas... (john.shaw@cybrcity.com)
-[-] Daily max packets.
-[-] Default template for new users (not until 3.0)
-[!] Date on startup (already did)
+[x] (OLMS) Screen output (report) while processing "toreader.ext" :). (FIXED: progress line showing area N/Total during TOREADER.EXT processing)
+[x] Join "ALL" current group only. (FIXED: VisableArea filter added after ReturnIncludes, restricts ALL to visible areas in current group)
+[x] Single column area display for usenet areas (FIXED: IsInternet() detection triggers single-column full-width name display for usenet-style areas)
+[x] Charge credits for certain areas... (john.shaw@cybrcity.com) (FIXED: GetAreaCredit() function reads AREACRDT.DAT per-area cost, deducted per message during packing)
+[x] Daily max packets. (FIXED: UNUSED[17] in SETUPrecord = daily max, 0=unlimited, checked before pack starts)
+[x] Default template for new users (not until 3.0) (FIXED: UNUSED[18] in SETUPrecord enables loading TEMPLATE.DAT as default USERrecord for new users)
+[x] Date on startup (already did) (CONFIRMED: last packet date displayed at startup, lines 2103-2106)
 [!] empty to field gives last one entered on upload (likely a bluewave problem, I've fixed the subject one as above)
-[!] Currently "w" only applies to "a", however I'll extend that to apply to "p" and "g" as well. (think it already does)
+[x] Currently "w" only applies to "a", however I'll extend that to apply to "p" and "g" as well. (FIXED: Written+fSELF now forces Pack for P and G modes, not just A)
 [!] in editor allow short cutting by typing in first few letters. (can't keys are defined for other things)
-[!] "Ignore Limits" for the user in question fixes vacation not working? (I never could reproduce this one, was a Ronnie thing)
+[x] "Ignore Limits" for the user in question fixes vacation not working? (CONFIRMED: IgnoreLimits bypasses MAXPPACK in vacation mode at line 2209, works correctly)

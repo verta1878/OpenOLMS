@@ -787,6 +787,16 @@ Begin
       BarMessage := '   Newuser   ';
       FillChar(Human^,Sizeof(USERrecord),0);
       FillChar(Human^.Bulletins,Sizeof(Human^.Bulletins),255);
+      { Fix 6: Load default template for new users }
+      If (Setup^.UNUSED[18] > 0) Then
+        Begin
+          If OpenFile(fTemplate,MainDir+'TEMPLATE.DAT','R',Sizeof(USERrecord),faReadOnly+faDenyNone) Then
+            Begin
+              BlockRead(fTemplate,Human^,1);
+              CloseFile(fTemplate);
+              Logit('D','Loaded new user template');
+            End;
+        End;
       For Count := 1 To MaxAreas Do If Is(Setup^.SysopFlags[Count],sDEFAULT) Then Human^.Flags[Count] := fALL;
       For Count := 1 To 200 Do
         Begin
@@ -965,6 +975,13 @@ Begin
       EndDoorMaker;
     End;
 
+    { Fix 5: Daily max packets check }
+  If (Setup^.UNUSED[17] > 0) And (Human^.TodayDownloads >= Setup^.UNUSED[17]) Then
+    Begin
+      WriteStringCF(LANG(L_ExceedDayLimit));
+      Exit;
+    End;
+
   InDownloadingPacket := True;
   FillChar(PackedMessage,Sizeof(PackedMessage),0);
 End;
@@ -1116,7 +1133,8 @@ Begin
             And (Not Human^.ShortList Or Selected(Conf) Or Is(PackedMessage[Conf DIV 8],1 Shl (Conf MOD 8)))
             Then
               Begin
-                Temp := ReturnFlags(Human^.Flags[Conf],Conf) + ReturnSettings(Conf,dCFG);
+                                Bullet(COL_SPIN); WriteString(#13+'Processing '+ZeroPad(Position,3)+'/'+ZeroPad(NumConf,0)+' ');
+Temp := ReturnFlags(Human^.Flags[Conf],Conf) + ReturnSettings(Conf,dCFG);
                 While Pos('.',Temp) > 0 Do Temp := Copy(Temp,1,Pos('.',Temp)-1) + Copy(Temp,Pos('.',Temp)+1,255);
                 Writeln(fCNF,'AREA '+ZeroPad(Conf,0)+' '+Temp);
               End;
@@ -1394,8 +1412,16 @@ Begin
                 Begin
                   DoColor(COL_CONFNUM);  Str(Conf:4,Temp); WriteString(Temp+'  ');
                   DoColor(COL_CONFFLAG); WriteString(ReturnFlags(Human^.Flags[RC],RC));
-                  DoColor(COL_CONFNAME); WriteString('  '+SpacePad(dCFG.Name,26));
-                  If (Displayed MOD 2) = 0 Then WriteLines(1) Else WriteChar(' ');
+                  { Fix 3: Single column for usenet/internet area names }
+                  If IsInternet(dCFG.Name) Then
+                    Begin
+                      DoColor(COL_CONFNAME); WriteStringCF('  '+dCFG.Name);
+                    End
+                  Else
+                    Begin
+                      DoColor(COL_CONFNAME); WriteString('  '+SpacePad(dCFG.Name,26));
+                      If (Displayed MOD 2) = 0 Then WriteLines(1) Else WriteChar(' ');
+                    End;
                 End;
             End
           Else
@@ -1516,6 +1542,15 @@ Begin
                        SaveLastRead;
                      End;
                  End;
+               { Fix 2: Filter ALL by visible areas (current group) }
+               For Count := 1 To NumConf Do
+                 If Includes[Count] Then
+                   Begin
+                     RC := ConferenceNumber(Count);
+                     Seek(fCFG,Count-1); BlockRead(fCFG,dCFG,1);
+                     If Not VisableArea(dCFG,RC) Then Includes[Count] := False;
+                   End;
+
                For Count := 1 To NumConf Do
                  Begin
                    If Includes[Count] Then
@@ -1700,6 +1735,7 @@ Var
   dL: LIMITSrecord;
   fC: File;
   dC: FILESrecord;
+  fTemplate: File;
   fH: File;
   dH: Array[0..19] Of FILESHDRrecord;
   LeftToFind, QueueSize, Count: Byte;
@@ -2146,6 +2182,9 @@ Begin
        {$ELSE}
        HMB_Scan(Conf,Human^.Flags[Conf]);
        {$ENDIF}
+
+       { Fix 4: Charge per-area credits }
+       Inc(GlobalPendingCredits,CPack*GetAreaCredit(Conf));
 
        If CPack > 0 Then
          Begin
